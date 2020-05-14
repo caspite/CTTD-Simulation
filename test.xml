@@ -1,0 +1,10 @@
+<experiment>
+    <sync-test name="DSA test" repeat-count="1" run-var="_" start="0" end="0" tick-size="0">
+        <algorithm name="DSA">
+        	<assign var="max-cycles" val="400" />
+        	<assign var="starting-value-file" val="starting_values.txt"/>
+        </algorithm>
+        <DistributedPoliceProblemGenerator/>
+        </sync-test>    
+   
+</experiment>

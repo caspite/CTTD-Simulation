@@ -1,0 +1,1 @@
+<experiment><execution-selector test-name="DSA test" algorithm-name="DSA" name="1380006007483" prob-number="1" exec-number="1" run-var="0.0" /><sync-test name="DSA test" seed="50" repeat-count="1" run-var="_" start="0.0" end="0.0" tick-size="0.1"><PoliceProblemGenerator /><default-tester /><algorithm name="DSA" instance-name="default" /></sync-test></experiment>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+	<classpathentry kind="lib" path="C:/Users/sofi/Documents/eclipse projects/azlib/lib/AbsoluteLayout.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sofi/Documents/eclipse projects/azlib/lib/args4j-2.0.17.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sofi/Documents/eclipse projects/azlib/lib/AZAPI.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sofi/Documents/eclipse projects/azlib/lib/AZCoreImpl.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sofi/Documents/eclipse projects/azlib/lib/AZDevImpl.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sofi/Documents/eclipse projects/azlib/lib/AZDevJFX.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sofi/Documents/eclipse projects/azlib/lib/bcel-5.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sofi/Documents/eclipse projects/azlib/lib/collections-generic-4.01.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sofi/Documents/eclipse projects/azlib/lib/DeepCopyUtil.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sofi/Documents/eclipse projects/azlib/lib/gnujaxp.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sofi/Documents/eclipse projects/azlib/lib/gson-1.7.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sofi/Documents/eclipse projects/azlib/lib/guava-10.0.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sofi/Documents/eclipse projects/azlib/lib/h2-1.3.160.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sofi/Documents/eclipse projects/azlib/lib/iText-2.1.5.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sofi/Documents/eclipse projects/azlib/lib/javassist-3.8.0.GA.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sofi/Documents/eclipse projects/azlib/lib/jcommon-1.0.16.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sofi/Documents/eclipse projects/azlib/lib/jfreechart-1.0.13.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sofi/Documents/eclipse projects/azlib/lib/jfreechart-1.0.13-experimental.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sofi/Documents/eclipse projects/azlib/lib/jfreechart-1.0.13-swt.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sofi/Documents/eclipse projects/azlib/lib/jung-algorithms-2.0.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sofi/Documents/eclipse projects/azlib/lib/jung-api-2.0.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sofi/Documents/eclipse projects/azlib/lib/jung-graph-impl-2.0.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sofi/Documents/eclipse projects/azlib/lib/junit.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sofi/Documents/eclipse projects/azlib/lib/qdox-2.0-20100906.201255-1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sofi/Documents/eclipse projects/azlib/lib/reflectasm-1.01-all.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sofi/Documents/eclipse projects/azlib/lib/reflections-0.9.5.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sofi/Documents/eclipse projects/azlib/lib/rsyntaxtextarea.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sofi/Documents/eclipse projects/azlib/lib/servlet.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sofi/Documents/eclipse projects/azlib/lib/slf4j-api-1.6.4.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sofi/Documents/eclipse projects/azlib/lib/swingx-1.6.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sofi/Documents/eclipse projects/azlib/lib/swtgraphics2d.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sofi/Documents/eclipse projects/azlib/lib/xom-1.2.7.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sofi/Documents/eclipse projects/DSA/jxl.jar"/>
+	<classpathentry kind="lib" path="C:/gurobi560/win64/lib/gurobi.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sofi/Documents/eclipse projects/DSA/jgrapht-0.9.0/lib/jgraph-5.13.0.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sofi/Documents/eclipse projects/DSA/jgrapht-0.9.0/lib/jgrapht-core-0.9.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sofi/Documents/eclipse projects/DSA/jgrapht-0.9.0/lib/jgrapht-demo-0.9.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sofi/Documents/eclipse projects/DSA/jgrapht-0.9.0/lib/jgrapht-ext-0.9.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sofi/Documents/eclipse projects/DSA/jgrapht-0.9.0/lib/jgrapht-ext-0.9.0-uber.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sofi/Documents/eclipse projects/DSA/jgrapht-0.9.0/lib/jgraphx-2.0.0.1.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
