@@ -36,7 +36,7 @@ public class MainSimulationForThreads {
 			agents = (int) Math.pow(i, 2);
 			patrols = (int) Math.pow(i, 2);
 			metrics = new MetricsSummary(algorithm, 100);
-			int[] numTasks = {20, 40, 60, 80, 100};//, 40, 60, 80, 100};//{20, 40, 60, 80, 100};
+			int[] numTasks = {20, 40, 60, 80, 100};
 
 			for (int t = 0; t < numTasks.length;t++) {
 				//numOfMissionsOnShift = Math.round(patrols*missions[t]/9.0);

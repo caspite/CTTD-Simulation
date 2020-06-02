@@ -234,7 +234,6 @@ public class DynamicPoliceAllocation {
 
 		}
 		//TC: what this for?
-		//TC: Small change to stay within range of j
 			while (true) {
 			int j = (int) (Math.random() * numOfPatrols) ;
 
@@ -385,18 +384,18 @@ public class DynamicPoliceAllocation {
 		
 		//TC: Add DCOP algorithem
 		//-----relevent for all
-		updateLocation(); //  if im on the way for a task, where im relevent to the task
-		creatUtilities(activeEvents); // creates the Utilities 
+		updateLocation(); //  if im on the way for a task, where im relevant to the task
+		creatUtilities(activeEvents); // creates the Utilities for each agent-task
 		
 		//-----relevent for all
-		creatLinearUtilitiesWithThreshold(activeEvents);
+		creatLinearUtilitiesWithThreshold(activeEvents);//relevant when the task priority is 1 or 2
 		
 		checkZeroUtility(utilities); // if there is very little left so I make it zero by force so fisher will work
 		// DistributedSolver s = new DistributedSolver(utilities, 2,policeUnits,
 		// activeEvents, null);
 		
 		UtilityBPBComparator2.tnow = Tnow;
-		
+
 		CooperativeCycleOrdering cco = new CooperativeCycleOrdering(activeEventsForAllocation, Tnow,
 				policeUnits);
 		
@@ -484,6 +483,7 @@ public class DynamicPoliceAllocation {
 		}
 	}
 
+	//
 	private boolean isConcavityRequired(Task task, Vector<Task> events) {
 		if(task.getPriority() != 2 && task.getPriority() != 1){
 			return false;

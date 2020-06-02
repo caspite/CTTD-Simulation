@@ -16,9 +16,10 @@ import PoliceTaskAllocation.PoliceUnit;
 
 public class Task implements Distancable, Serializable, Comparable<Task>, Messageable{
 	protected Location location;// the location of the mission
-	
+
 	protected double totalDuration;// the remaining duration of the mission
 	protected double workload;// remained workload (remained time)
+
 	protected  TreeMap<AgentType, Double> durationDivision;
 	protected double missionArrivalTime;// when the mission arrives to the sysytem
 	protected double freezTime;// when the mission was abandoned
@@ -62,6 +63,12 @@ public class Task implements Distancable, Serializable, Comparable<Task>, Messag
 		this.priority = priority;
 		agents = new Vector<Assignment>();
 
+	}
+
+	public Task(Location location,int id) {
+		super();
+		this.location = location;
+		this.id = id;
 	}
 
 	public Task(Location location, double duration, double startTime, int id,
