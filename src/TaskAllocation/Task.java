@@ -9,6 +9,8 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.Vector;
 
+import CTTD.Casualty;
+import CTTD.TriageActivity;
 import Helpers.URLConnectionReader;
 import PoliceTaskAllocation.AgentType;
 import PoliceTaskAllocation.MainSimulationForThreads;
@@ -40,7 +42,7 @@ public class Task implements Distancable, Serializable, Comparable<Task>, Messag
 	
 	//Required agents to the mission
 	protected int numOfAgentsRequired;
-	protected HashMap<AgentType, Integer> agentsRequiered;
+	protected HashMap<AgentType, Integer> agentsRequiered=new HashMap<>();
 	
 	// Saves working times and number of agents on the mission
 	protected TreeMap<Integer, Double> workingTime;
@@ -55,12 +57,14 @@ public class Task implements Distancable, Serializable, Comparable<Task>, Messag
 	protected Map<PoliceUnit,Message> messageRecived;
 	protected double taskChange;
 	protected Map<PoliceUnit,Double> allocation;
+	protected double remainCover;
 	
 	public Task(double duration, int id, int priority) {
 		super();
 		this.totalDuration = duration;
 		this.id = id;
 		this.priority = priority;
+
 		agents = new Vector<Assignment>();
 
 	}
@@ -69,6 +73,21 @@ public class Task implements Distancable, Serializable, Comparable<Task>, Messag
 		super();
 		this.location = location;
 		this.id = id;
+	}
+	public Task(Location location,int id,double startTime,int priority,double remainCover) {
+		super();
+		this.location = location;
+		this.id = id;
+		this.missionArrivalTime=startTime;
+		this.priority=priority;
+		this.remainCover=remainCover;
+	}
+	public Task(Location location,int id,double startTime) {
+		super();
+		this.location = location;
+		this.id = id;
+		this.missionArrivalTime=startTime;
+
 	}
 
 	public Task(Location location, double duration, double startTime, int id,
@@ -85,7 +104,7 @@ public class Task implements Distancable, Serializable, Comparable<Task>, Messag
 		this.DFTime = -1;
 		this.agents = new Vector<Assignment>();
 		this.utility = utility;
-		this.workingTime = new TreeMap<Integer, Double>();
+		this.workingTime = new TreeMap<Integer, Double>();//working time for each agent
 		this.agentsRequiered = agentsRequired;
 		this.allocatedAgents = new HashMap<AgentType, Integer>();
 		this.workingTime.put(0, 0.0);
@@ -117,7 +136,7 @@ public class Task implements Distancable, Serializable, Comparable<Task>, Messag
 		// this.PLUtility.put(agentsRequiered,utility);
 
 	}
-
+	// reduce the allocatedAgents by type
 	private void updateAllocatedAgents(AgentType type, int i) {
 		if (allocatedAgents.containsKey(type)) {
 			allocatedAgents.put(type, allocatedAgents.get(type) + i);
@@ -199,20 +218,23 @@ public class Task implements Distancable, Serializable, Comparable<Task>, Messag
 		if(agents.contains(a)){
 			updateWorkingTimes(tnow);
 			agents.remove(a);
-			updateAllocatedAgents(a.getType(), -1);
+			updateAllocatedAgents(a.getType(), -1);//reduce num of allocated agents
 			if (a.getArrivalTime() > 0) {
+
 				double tempWorkload = durationDivision.get(type) - (tnow - a.getArrivalTime());
 				workload = workload - (tnow - a.getArrivalTime());
 
 				durationDivision.put(type, tempWorkload);
+
+				setRemainCoverStatic(a);//static assignment
 			}
 		}
 	}
-
+  public void setRemainCoverStatic(Assignment as){}
 	// All agents deleted from the mission. It receives true in the case of
 	// reallocation.
 	public void missionAbandoned(boolean isReallocation, double tnow) {
-
+//update utility (not relevant to CTTD)
 		utility = utility * (workload / totalDuration);
 		createsPLUtility();
 
@@ -413,6 +435,10 @@ public class Task implements Distancable, Serializable, Comparable<Task>, Messag
 	public boolean isAgentTypeRequired(AgentType key) {
 		return agentsRequiered.containsKey(key);
 	}
+	public boolean isAgentTypeRequired(Agent agent) {
+		return isAgentTypeRequired(agent.getAgentType());
+	}
+	public boolean isAgentRequired(Agent agent,double Tnow){return true;}
 
 	public void initFisherCA(Mailer mailer) {
 		this.mailer = mailer;

@@ -8,5 +8,9 @@ public class EndShiftEvent extends DiaryEvent {
 		time=tmax;
 				
 	}
+	public String toString() {
+		return ("End Shift Event" + getEvent()+ " time: "+time);
+	}
+
 
 }

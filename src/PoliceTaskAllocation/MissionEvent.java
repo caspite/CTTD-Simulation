@@ -7,7 +7,7 @@ import TaskAllocation.*;
 
 public class MissionEvent extends Task{
 	
-
+//------------------------------------------------constructor------------------------------------------//
 
 	public MissionEvent(Location location, double duration, double startTime,
 			int id, int priority,double utility,HashMap<AgentType, Integer> agentsRequired) {
@@ -15,6 +15,17 @@ public class MissionEvent extends Task{
 
 	}
 
+	public MissionEvent(Location location, double startTime,
+						int id, int priority,double remainCover) {
+		super(location, id,startTime, priority,remainCover);
+	}
+	public MissionEvent(double duration, int id, int priority) {
+		super(duration, id, priority);
+	}
+	public MissionEvent(Location location,int id, double startTime) {
+		super(location, id,startTime);
+	}
+//-------------------------------getters & setters --------------------------------------//
 	public double getStartTime() {
 		
 		return missionArrivalTime;
@@ -25,6 +36,11 @@ public class MissionEvent extends Task{
 		MissionEvent m=new MissionEvent(location, totalDuration, missionArrivalTime, id, priority, utility, agentsRequiered);
 		return m;
 	}
+
+	public void setStarted(boolean isStarted) {
+		this.isStarted = isStarted;
+	}
+
 
 
 

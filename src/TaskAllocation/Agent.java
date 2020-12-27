@@ -2,6 +2,10 @@ package TaskAllocation;
 
 import java.io.Serializable;
 import java.util.*;
+
+import CTTD.Activity;
+import CTTD.Triage;
+import CTTD.TriageActivity;
 import Helpers.URLConnectionReader;
 import PoliceTaskAllocation.*;
 
@@ -16,7 +20,10 @@ public class Agent implements Distancable, Serializable {
 	protected boolean isWaiting;
 	protected transient Assignment currentTask;// / his current task
 	protected int currentTaskID;
+	protected double speed=60;
 	protected Status status;//
+	private TreeMap<Integer,TriageActivity> skills;
+	//For CTTD agent Type is the agets' Type - not the capabilities
 	protected HashSet<AgentType> agentType; // agents' capabilities
 
 	public Agent(Location location, int id, HashSet<AgentType> agentType) {
@@ -25,10 +32,12 @@ public class Agent implements Distancable, Serializable {
 		this.id = id;
 		this.agentType = agentType;
 		this.currentTask =  null;
+		this.speed = 60;
 	}
-
+	public Agent(){};
 	public Agent(int id, HashSet<AgentType> agentType) {
 		this(null, id, agentType);
+		this.speed = 60;
 	}
 
 	public HashSet<AgentType> getAgentType() {
@@ -72,6 +81,9 @@ public class Agent implements Distancable, Serializable {
 
 	}
 
+	public double getSpeed(){
+		return speed;
+	}
 	public void setLocation(double Tnow) {
 		if (!onTheWay)
 			return;
@@ -151,6 +163,8 @@ public class Agent implements Distancable, Serializable {
 		return movingTime;
 	}
 
+
+
 	public void setMovingTime(double movingTime) {
 		this.movingTime = movingTime;
 	}
@@ -158,5 +172,10 @@ public class Agent implements Distancable, Serializable {
 	public int getCurrentTaskID() {
 		return currentTaskID;
 	}
+
+public double getActivityTime(Triage trg, Activity act){
+		return 0;
+
+}
 
 }

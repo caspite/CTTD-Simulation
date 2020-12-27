@@ -1,38 +1,51 @@
 package CTTD;
 
-import java.security.PublicKey;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.lang.reflect.Array;
+import java.util.*;
 
 public class Casualty {
-private Triage triage;
-public double survival;
+public Triage triage;
+public double survival;//the current survival
+public double timeToSurvive;
 public Status status;
-private Activity activity[];
+private Activity activity[]={Activity.TRANSPORT,Activity.UPLOADING,Activity.TREATMENT};//the list of the casualty's activities to allocate
 public int priority;
 private double StandbyTime;
+private double TBorn;//time that the casualty born
+public int id;
+public int DS_Id;
+private double initSurvival; // the init survival of the cas
+private double finiteSurvival;
+
+
     public enum Status{
         WATING,RECEIVEDTREATMENT,LOADED,FINISHED
     }
-    //constructors---------------------------------------------//
+    //-------------------------constructors---------------------------------------------//
     public Casualty(){}
-    public Casualty(Triage triage,Status status,Activity activity,double survival)
+    public Casualty(Triage triage,Status status,double survival,int id,int DS_ID,double TBorn)
     {
         this.triage=triage;
         this.status=status;
-        this.activity=Activity.values();
         this.survival=survival;
+        this.id=id;
+        this.DS_Id=DS_ID;
+        this.TBorn=TBorn;
+        this.initSurvival=survival;
+        setTimeToSurvive();
+        setPriority();
     }
 
-    //calculate survival
-    public void setSurvival(double Tnow,Triage triage) {
-        this.survival = 0 ;
+    //calculate survival-------------------------------------//
+    //TODO - different init survival
+    public void setSurvival(double Tnow) {
+       this.survival=Probabilities.getSurvival(triage,TBorn, Tnow, status);
     }
 
-    //set activities time
-    public void setActivityDuration(Activity activity,Triage triage) {
-        this.activity = Activity.values();
-    }
+public void setTimeToSurvive(){
+
+        this.timeToSurvive= Probabilities.getTimeToSurvive(this.triage,this.TBorn);
+}
 
     public void setPriority() {
         switch (triage) {
@@ -48,37 +61,158 @@ private double StandbyTime;
     //getters
     public double getSurvival() {return survival;}
 
+    public double getTBorn() {return TBorn;}
+
     public Triage getTriage() {return triage;}
 
     public Status getStatus() {return status;}
 
     public Activity[] getActivity() {return activity;}
 
-    /***
-     *
-     * @param status the current status of the casualty
-     * @param survival the  survival according to the current time of the simulation
-     * @return HashMap this the remained activity for the casualty
-     * @UPDATE the calculation of the activities time
-     */
-    //TODO update the functions
 
-    public HashMap<Activity,Double> getActivityDuration( Status status,double survival){
+
+    //hashmap with activities duration
+    public HashMap<Activity,Double> getActivityDuration(){
         HashMap<Activity,Double> ActDuration=new HashMap<Activity,Double>();
-        ActDuration.put(Activity.TRANSPORT,0.0);// Arbitrary duration function
+        ActDuration.put(Activity.TRANSPORT,Probabilities.getActivity(triage,survival,Activity.TRANSPORT));//
 
         switch (status){
             case WATING:
-                ActDuration.put(Activity.TREATMENT,survival*5);// Arbitrary duration function
-                ActDuration.put(Activity.UPLOADING,survival*3);// Arbitrary duration function
+                ActDuration.put(Activity.TREATMENT,Probabilities.getActivity(triage,survival,Activity.TREATMENT));
+                ActDuration.put(Activity.UPLOADING,Probabilities.getActivity(triage,survival,Activity.UPLOADING));
             case RECEIVEDTREATMENT:
-                ActDuration.put(Activity.UPLOADING,survival*3);// Arbitrary duration function
+                ActDuration.put(Activity.UPLOADING,Probabilities.getActivity(triage,survival,Activity.UPLOADING));
             case LOADED:
             case FINISHED:
                 return null;
         }
         return ActDuration;
+    }
+    public boolean isAgentRequired(MedicalUnit medicalUnit,double timeArrival){
+        //check if casualty will survive at time arrival
+        if(timeArrival>this.timeToSurvive)
+            return false;
+        else{
+            //Compare agent skills and casualty demands
+            return compareAgentCasualtyActivities(medicalUnit);
+        }
 
+    }
+    private boolean compareAgentCasualtyActivities(MedicalUnit mu){
+        //check if agent skill fit to casualty
+        Vector <Skill> skills =mu.getAgentSkills().getCapacity();
+        for(int i=0;i<getActivity().length;i++){
+           Skill s=new Skill(triage, (Activity)Array.get(getActivity(),i));
+           if(skills.contains(s))
+               return true;
+        }
+        return false;
+
+    }
+    public Activity getNextActivity(){
+        switch (this.getStatus()){
+            case WATING:
+                return Activity.TREATMENT;
+            case RECEIVEDTREATMENT:
+                return Activity.UPLOADING;
+            case LOADED:
+                return Activity.TRANSPORT;
+            case FINISHED:
+                return null;
+
+        }
+    return null;
+    }
+
+    public void setStatus(Status s){
+        switch (status){
+            case WATING:
+                this.status=Status.RECEIVEDTREATMENT;
+                break;
+            case RECEIVEDTREATMENT:
+                this.status=Status.LOADED;
+                break;
+            case LOADED:
+                this.status=Status.FINISHED;
+                break;
+
+
+        }
+    }
+
+    //reduce set of needed activities
+    public void setActivity(Activity act){
+        Activity[] temp=new Activity[activity.length-1];
+        int j=0;
+        for(int i=0;i<activity.length;i++){
+            if(!activity[i].equals(act)){
+                temp[j]=activity[i];
+                j++;
+            }
+        }
+        activity=temp;
+    }
+
+    public void setActivitiesByStatus(){
+        Activity temp[];
+
+        switch (status){
+
+            case WATING:
+                temp=new Activity[]{Activity.TRANSPORT,Activity.UPLOADING,Activity.TREATMENT};
+                break;
+            case RECEIVEDTREATMENT:
+                temp=new Activity[]{Activity.TRANSPORT,Activity.UPLOADING};
+                break;
+            case LOADED:
+                temp=new Activity[]{Activity.TRANSPORT};
+                break;
+
+            default:
+                temp=new Activity[]{};
+
+        }
+        activity=temp;
+
+    }
+
+    public void setFiniteSurvival(double Tnow){
+        this.finiteSurvival=Probabilities.getSurvival(triage,TBorn, Tnow, status);
+    }
+
+
+//    public HashMap<Casualty, Activity> getActivitiesForAgent(MedicalUnit medicalUnit){
+//        HashMap<Casualty, Activity> casualtyActivityHashMap=new HashMap<>();
+//        HashMap<TriageActivity,Integer> tempAgentSkills = medicalUnit.getAgentSkills();
+//
+//        //remove empty capacity
+//        for (Map.Entry<TriageActivity,Integer> entry :tempAgentSkills.entrySet()) {
+//            if (entry.getValue() == 0) {
+//                tempAgentSkills.remove(entry.getKey());
+//            }
+//        }
+//        HashSet agentSkills=new HashSet<TriageActivity>();
+//        agentSkills.addAll(tempAgentSkills.keySet());
+//        for(Activity act:activity){
+//            TriageActivity tempTriage=new TriageActivity(this.triage,act);
+//            if (agentSkills.contains(tempTriage)){
+//                casualtyActivityHashMap.put(this,act);
+//            }
+//        }
+//        return casualtyActivityHashMap;
+//    }
+
+//    public Vector<TriageActivity> getTriageAct (MedicalUnit medicalUnit){
+//        Vector<TriageActivity> triageActivity = new Vector<>();
+//        for(Activity act:activity){
+//            TriageActivity tempTriage=new TriageActivity(this.triage,act);
+//            triageActivity.add(tempTriage);
+//        }
+//        return triageActivity;
+//
+//    }
+    public String toString(){
+        return "\nCasualty: "+this.id+" init survival : "+this.initSurvival+" current survival: "+this.survival;
     }
 
 

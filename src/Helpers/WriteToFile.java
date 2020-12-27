@@ -6,17 +6,61 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.Vector;
 
-import javax.swing.text.html.parser.Entity;
-
+import CTTD.Casualty;
+import CTTD.MedicalUnit;
 import TaskAllocation.Assignment;
+import TaskAllocation.Task;
 import TaskAllocation.Utility;
 
 public class WriteToFile {
-	
+
+	//---------------static class write fo file - outputs and generate CTTD problam----------------//
+	//TODO add titles for sheets + write to sheets
+
+	public static void CTTD_DisasterSite(String fileName, Vector<Task> DiSasterSites) {
+		try {
+			BufferedWriter out = openFile2(fileName);
+			for(Task ds :DiSasterSites){
+				String o = ""+ ds.getId()+","+ ds.getLocation().getLat()+","+ ds.getLocation().getLng()+","+ ds.getMissionArrivalTime();
+				out.write(o);
+				out.newLine();
+			}
+			out.close();
+		} catch (IOException e) {
+			System.err.println("Couldn't write to file");
+		}
+	}
+	public static void CTTD_Casualties(String fileName, Vector<Casualty> Casualties) {
+		try {
+			BufferedWriter out = openFile2(fileName);
+			for(Casualty cas:Casualties){
+				String o = ""+cas.id+","+cas.DS_Id+","+cas.getTBorn()+","+cas.survival+","+cas.getTriage();
+				out.write(o);
+				out.newLine();
+			}
+			out.close();
+		} catch (IOException e) {
+			System.err.println("Couldn't write to file");
+		}
+	}
+	public static void CTTD_MedicalUnits(String fileName, Vector<MedicalUnit> MedicalUnits) {
+		try {
+			BufferedWriter out = openFile2(fileName);
+
+			for(MedicalUnit MU:MedicalUnits){
+				String o = ""+MU.getId()+","+MU.getLocation().getLat()+","+MU.getLocation().getLng()+","+MU.getOneAgentType();
+				out.write(o);
+				out.newLine();
+			}
+
+			out.close();
+		} catch (IOException e) {
+			System.err.println("Couldn't write to file");
+		}
+	}
 	/// write to file fishers algorithm output
 	public static void writeFisherOutpuToFile(Double[][] ds) {
 		try {

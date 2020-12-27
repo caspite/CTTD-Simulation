@@ -68,7 +68,7 @@ public abstract class DiaryEvent implements Comparable<DiaryEvent>{
 		return true;
 	}
 	public String toString() {
-		 return ("Time: "+time);
+		 return ("Diary event Time: "+time);
 		//return ("Mission Code: "+event.getMissionCode()+", Priority: "+event.getPriority()+", Time: "+event.getArrivalTime()+", Duration: "+event.getDuration()+", Units Required: "+event.getUnitsRequired()+", Location: "+event.getLocation().toString()+"\n");
 	}	
 	public Assignment getAssignment() {

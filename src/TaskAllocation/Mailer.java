@@ -21,8 +21,7 @@ public class Mailer {
 	private int delayUb;
 	
 	private Random rP3,rP4,delayUbR;
-	
-	
+
 
 	public Mailer(int shift, double p3, double p4, int delayUb) {
 		this.shift = shift;

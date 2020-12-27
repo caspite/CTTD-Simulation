@@ -8,4 +8,8 @@ public class NewDiaryEvent extends DiaryEvent {
 		// TODO Auto-generated constructor stub
 	}
 
+	public String toString() {
+		return ("New Task: " + getEvent().getId()+ " time: "+time+"Task hard constraint: "+getEvent().getHardConstraintTime()+"////////////////////////////////////////////////////////");
+	}
+
 }
