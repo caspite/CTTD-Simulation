@@ -2,9 +2,9 @@ package CTTD;
 
 import PoliceTaskAllocation.AgentType;
 import TaskAllocation.Agent;
+import TaskAllocation.Assignment;
 import TaskAllocation.Location;
 
-import javax.swing.text.html.HTMLDocument;
 import java.util.*;
 
 public class MedicalUnit extends Agent  {
@@ -135,6 +135,11 @@ public class MedicalUnit extends Agent  {
         return "\nMedical unit: "+this.id+" type : "+this.agentType+" "+this.skills;
 
  }
+
+
+
+
+
 
 }
 //     private int[] getActivityMatrix(Activity activity,Triage triage) {

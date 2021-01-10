@@ -12,6 +12,8 @@ public class Skill {
     private Triage triage;
     private double score;
 //----------------------------constructors------------------------------------------------------------//
+    public Skill(){}
+
     public Skill(Triage triage, Activity activity,double  duration,double score){
         this.activity=activity;
         this.triage=triage;

@@ -164,7 +164,12 @@ public class DisasterSite extends MissionEvent {
       return false;
   }
 
-
+public void reduceDemands(Skill skill){
+    if(demands.contains(skill))
+      this.demands.remove(skill);
+    else
+      System.out.println("Skill not exist!!!");
+}
   private double AgentTimeToTravel(MedicalUnit medicalUnit){
 
    return Distance.travelTime(medicalUnit,this);
@@ -182,9 +187,17 @@ public class DisasterSite extends MissionEvent {
     return finished;
   }
 
-  public Vector <Skill> activitiesAssignment(Assignment as) {
-    Vector<Skill> actAs=new Vector<>();
-    MedicalUnit mu= (MedicalUnit)as.getAgent();
+  /***
+   * assignment agent skill regardless of the schedule
+   * @param as assignment agent to task
+   * @return TreeMap - start time for each skill
+   */
+  public TreeMap<Double,Skill> activitiesAssignment(Assignment as) {
+    TreeMap<Double,Skill> activitiesAssignment=new TreeMap<>();//the return
+    MedicalUnit mu= (MedicalUnit)as.getAgent();//the agent
+    double capacity = mu.skills.getCurrentScore();//the agent capacity//TODO potential bug!! check if update capacity --> agent skills
+    Vector<Skill> skills = mu.getAgentSkills().getCapacity();//agent free skills
+    double time=as.getArrivalTime();//the current start time for each activity
 
     //if agent required to the task
     if(isAgentRequired(mu,as.getArrivalTime()))
@@ -192,32 +205,28 @@ public class DisasterSite extends MissionEvent {
       //start with the urgent casualty
       this.sortCasualtiesBySurvival();
       for(int i=0; i< casualties.size();i++){
+        int j=0;
         Casualty cas=casualties.get(i);
+        Activity[] activity=cas.getActivity();
         //if agent have free capacity
-        if(!mu.isFull) {
+        if(capacity>0) {
           if (cas.status != Casualty.Status.FINISHED) {
             //check if agent skills and time arrival is relevant
-            if (cas.isAgentRequired(mu, as.getArrivalTime())) {
+            if (cas.isAgentRequired(mu, time)) {
               //while tha cas has open activities
-              while(cas.getActivity().length>0&&!mu.isFull){
+              while(j<activity.length&&capacity>0){
                 //get cas next activity
-                Activity act = cas.getNextActivity();
+                Activity act = activity[j];
                 //check if the agent skill contains the demand and add to the HashMap
-                Skill s = new Skill(cas.getTriage(), act);
-                if (mu.skills.getCapacity().contains(s)) {
-                  actAs.add(s);
-                  //reduce activity from cas and change status
-                  Casualty.Status st=cas.getStatus();
-                  cas.setStatus(st);
-                  cas.setActivity(act);
+                Skill s = new Execution(cas.getTriage(), act,cas);
+                if (skills.contains(s)) {
+                  activitiesAssignment.put(time,s);
                   //reduce agent capacity
-                  mu.reduceCapacity(s);
-                  // update casualties on the  if the action is uploading
-                  if(act.equals(Activity.UPLOADING)){
-                    mu.setCasualties(cas);
-                    reduceCasualties(cas);
-                  }
+                  capacity-=s.getScore();
+                  //set time
+                  time+=s.getDuration();
                 }
+                j++;
                 System.out.println("Agent: "+mu.getId()+" cas id: "+cas.id+" act: "+act);
               }
             }
@@ -225,10 +234,50 @@ public class DisasterSite extends MissionEvent {
         }
       }
     }
-    return actAs;
+
+//    //if agent required to the task
+//    if(isAgentRequired(mu,as.getArrivalTime()))
+//    {
+//      //start with the urgent casualty
+//      this.sortCasualtiesBySurvival();
+//      for(int i=0; i< casualties.size();i++){
+//        Casualty cas=casualties.get(i);
+//        //if agent have free capacity
+//        if(!mu.isFull) {
+//          if (cas.status != Casualty.Status.FINISHED) {
+//            //check if agent skills and time arrival is relevant
+//            if (cas.isAgentRequired(mu, as.getArrivalTime())) {
+//              //while tha cas has open activities
+//              while(cas.getActivity().length>0&&!mu.isFull){
+//                //get cas next activity
+//                Activity act = cas.getNextActivity();
+//                //check if the agent skill contains the demand and add to the HashMap
+//                Skill s = new Skill(cas.getTriage(), act);
+//                if (mu.skills.getCapacity().contains(s)) {
+//                  actAs.add(s);
+//                  //reduce activity from cas and change status
+//                  Casualty.Status st=cas.getStatus();
+//                  cas.setStatus(st);
+//                  cas.setActivity(act);
+//                  //reduce agent capacity
+//                  mu.reduceCapacity(s);
+//                  // update casualties on the  if the action is uploading
+//                  if(act.equals(Activity.UPLOADING)){
+//                    mu.setCasualties(cas);
+//                    reduceCasualties(cas);
+//                  }
+//                }
+//                System.out.println("Agent: "+mu.getId()+" cas id: "+cas.id+" act: "+act);
+//              }
+//            }
+//          }
+//        }
+//      }
+//    }
+    return activitiesAssignment;
   }
 
-  private void reduceCasualties(Casualty cas){
+  public void reduceCasualties(Casualty cas){
     casualties.remove(cas);
     setRemainCover();
     if (casualties.size()<=0){

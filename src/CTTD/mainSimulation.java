@@ -324,11 +324,13 @@ public class mainSimulation {
         Tnow = tnow; // set simulation  Time - hours
         Told = Tnow;
 
-        //update agent's capacity
+        //update agent's capacity+ utilities for the current task - to add for each agent the estimate utility
+        for(Agent a: medicalUnits){
+            a.upateAgent(tnow);
+            //clear diary events
 
-        //update casualties' survaival
-        //update task current score + task current casualties
-        //update indices
+        }
+
 
 
     }

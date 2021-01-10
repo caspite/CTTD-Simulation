@@ -22,6 +22,9 @@ public class Agent implements Distancable, Serializable {
 	protected int currentTaskID;
 	protected double speed=60;
 	protected Status status;//
+	protected Vector<Assignment> schedule;//the agent *upcoming* schedule.
+											// one assignment for each task -
+											// assignment include needed skills+casualties
 	private TreeMap<Integer,TriageActivity> skills;
 	//For CTTD agent Type is the agets' Type - not the capabilities
 	protected HashSet<AgentType> agentType; // agents' capabilities
@@ -176,6 +179,13 @@ public class Agent implements Distancable, Serializable {
 public double getActivityTime(Triage trg, Activity act){
 		return 0;
 
+}
+
+public void upateAgent(double tnow){
+		//loop all schedule
+		for(Assignment as:schedule){
+			as.updateAs(tnow);
+		}
 }
 
 }
