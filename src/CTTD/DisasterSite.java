@@ -1,5 +1,8 @@
 package CTTD;
 
+import CttdSolver.FirstMessage;
+import CttdSolver.UtilityMessage;
+import DCOP.*;
 import PoliceTaskAllocation.AgentType;
 import PoliceTaskAllocation.MissionEvent;
 import TaskAllocation.Agent;
@@ -8,6 +11,7 @@ import TaskAllocation.Location;
 
 import java.lang.reflect.Array;
 import java.util.*;
+
 
 public class DisasterSite extends MissionEvent {
 
@@ -18,7 +22,17 @@ public class DisasterSite extends MissionEvent {
   private Vector <Skill> demands;//the disaster site demands according to casualties
   private TreeMap<Double, Skill> activitiesSchedule;
   private boolean finished;
-  //---------------------------constructors---------------------------------------------//
+
+  //*** Message Variables ***//
+  AgentMessageBox agentMessageBox;
+
+  //*** allocation variables ***//
+  HashMap<Integer,Vector<Execution>> currentAllocation;
+  HashMap<Integer,Vector<Execution>> waitingAllocation;
+
+//----------------------------------methods---------------------------------------------------//
+
+  //***constructors***//
   public DisasterSite(double duration, int id,double startTime, int priority){
     super(duration,  id,  priority);
     this.missionArrivalTime=startTime;
@@ -164,6 +178,7 @@ public class DisasterSite extends MissionEvent {
       return false;
   }
 
+
 public void reduceDemands(Skill skill){
     if(demands.contains(skill))
       this.demands.remove(skill);
@@ -286,6 +301,87 @@ public void reduceDemands(Skill skill){
 
     }
 
+  }
+
+  //*** Message Methods ***//
+
+  public void createUtilityMessage(Message message){
+    Vector<Skill> executions = calcExecution(((FirstMessage)message).getCapacity(),((FirstMessage)message).getTimeArrival());
+    double utility =calcUtility(executions);
+    Message newMessage = new UtilityMessage(this.id,message.getSenderId(),utility,executions);
+
+  }
+
+  private Vector<Skill> calcExecution(Capacity capacity,double timeArrival){
+    Vector<Skill> executions =new Vector<>();
+    //check if the agent relevant
+    if(isServiceRequired(capacity,timeArrival)){
+      executions =solverGreedyAssignment(capacity,timeArrival);
+    }
+    else
+      return null;
+    return executions;
+  }
+
+  public boolean isServiceRequired(Capacity skills, double timeArrival){
+    //check time arrival
+    if(isTimeArrivalRelevant(timeArrival)){
+      //check if disaster site demands  fits to agent skills.
+      for(Skill s: demands){
+        if(skills.getCapacity().contains(s)){
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  public Vector<Skill> solverGreedyAssignment(Capacity capacity,double timeArrival) {
+    Vector<Skill> execution=new Vector<>();
+    //start with the urgent casualty - greedy
+    this.sortCasualtiesBySurvival();
+    for (int i = 0; i < casualties.size(); i++) {
+      int j = 0;
+      Casualty cas = casualties.get(i);
+      Activity[] activity = cas.getActivity();
+      //if agent have free capacity
+      if (capacity.getCurrentScore() > 0) {
+        if (cas.status != Casualty.Status.FINISHED) {
+          //check if agent skills and time arrival is relevant
+          if (cas.isServiceRequired(capacity, timeArrival)) {
+            //while tha cas has open activities
+            while (j < activity.length && capacity.getCurrentScore() > 0) {
+              //get cas next activity
+              Activity act = activity[j];
+              //check if the agent skill contains the demand and add to the execution
+              Skill s = new Execution(cas.getTriage(), act, cas);
+              if (capacity.getCapacity().contains(s)) {
+                execution.add(s);
+                //reduce capacity
+                capacity.reduceCap(s.getTriage(),s.getActivity());
+                //set time
+                timeArrival += s.getDuration();
+              }
+            }
+          }
+        }
+      }
+
+    }
+    return execution;
+  }
+
+  private double calcUtility(Vector<Skill> executions){
+    double utility=0;
+    if(executions==null){
+      return -1;
+    }
+    else{
+      for(Skill ex:executions){
+       utility+= ((Execution)ex).getUtility();
+      }
+    }
+    return utility;
   }
 
 

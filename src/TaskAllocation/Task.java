@@ -9,8 +9,7 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.Vector;
 
-import CTTD.Casualty;
-import CTTD.TriageActivity;
+import DCOP.Mailer;
 import Helpers.URLConnectionReader;
 import PoliceTaskAllocation.AgentType;
 import PoliceTaskAllocation.MainSimulationForThreads;
@@ -541,7 +540,7 @@ public class Task implements Distancable, Serializable, Comparable<Task>, Messag
 	
 	@Override
 	public void createMessage(Messageable p, double allocation) {
-		this.mailer.createMessage(this, this.decisionCounter, p, allocation);
+	//	this.mailer.createMessage(this, this.decisionCounter, p, allocation);
 	}
 
 	public double getTaskChanges() {

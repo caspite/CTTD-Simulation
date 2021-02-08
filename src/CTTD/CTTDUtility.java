@@ -5,8 +5,9 @@ import TaskAllocation.Task;
 import TaskAllocation.Utility;
 
 public class CTTDUtility  extends Utility {
-    TriageActivity triageActivity;
-    int capacity;
+
+    double contribution;//the contribution in score
+
 
     //-------------------constructor---------------------------------//
     public CTTDUtility(Agent agent, Task task,double Tnow){

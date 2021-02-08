@@ -3,12 +3,9 @@ package Solver;
 import java.util.Vector;
 
 import PoliceTaskAllocation.PoliceUnit;
-import fisher.FisherDistributed;
 import fisher.FisherDistributedCA;
-import fisher.FisherPolinom;
-import fisher.FisherSemiDistributed;
 import TaskAllocation.Assignment;
-import TaskAllocation.Mailer;
+import DCOP.Mailer;
 import TaskAllocation.Task;
 import TaskAllocation.Utility;
 

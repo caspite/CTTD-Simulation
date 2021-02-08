@@ -136,14 +136,15 @@ public class GenerateProblem {
             int priority = setPriority();
             if (this.newDS > rnd) {
                 DS_ID += 1;
-                CreateDS(DS_ID,priority);
+                int disasterSiteId =calcId(1,DS_ID);
+                CreateDS(disasterSiteId,priority);
 
                 rnd = rNewCas.nextDouble();
                 boolean empty = true;
                 for (int i=0; i<MaxCasForSite;i++) {
                     if (this.newCas > rnd){
                         empty=false;
-                        Cas_ID = getCasId(tempID += 1,DS_ID);
+                        Cas_ID = getCasId(tempID += 1,disasterSiteId);
                         rnd = rTriage.nextDouble();
                        Triage trg=getTriage(rnd);
                         CreateCas(trg, Cas_ID);
@@ -151,7 +152,7 @@ public class GenerateProblem {
                 }
                 if (empty==true){
                     empty=false;
-                    Cas_ID = getCasId(tempID += 1,DS_ID);
+                    Cas_ID = getCasId(tempID += 1,disasterSiteId);
                     rnd = rTriage.nextDouble();
                     Triage trg=getTriage(rnd);
                     CreateCas(trg, Cas_ID);
@@ -181,10 +182,11 @@ public class GenerateProblem {
             } else if ((double)prop[1] < rnd & rnd <= (double)prop[2]) {
                 agt = agentTypeProbability.get((double) prop[2]);
             }
-            CreateMU(agt, i);
-
+           //calc the Id
+            int id = calcId(2,i);
+            CreateMU(agt, id);
         }
-        CreateHospital(1);
+        CreateHospital(calcId(3,1));
         createDiaryEvent(DisasterSites);
         WriteToFile.CTTD_MedicalUnits("CTTD_MedicalUnits.csv", this.MedicalUnits);
         WriteToFile.CTTD_DisasterSite("CTTD_DisasterSite.csv",this.DisasterSites);
@@ -214,6 +216,13 @@ public class GenerateProblem {
         return trg;
     }
 
+    private int calcId(int idType,int numOfId){
+
+        String idToReturn=""+idType+numOfId+"";
+        int id=Integer.parseInt(idToReturn);
+
+        return id;
+    }
 
 
 

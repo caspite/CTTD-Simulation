@@ -1,6 +1,6 @@
 package PoliceTaskAllocation;
 
-import fisher.FisherSemiDistributed;
+import DCOP.Mailer;
 
 import java.util.*;
 import java.util.Map.Entry;

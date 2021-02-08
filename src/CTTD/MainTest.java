@@ -7,7 +7,7 @@ import java.util.*;
 public class MainTest {
     public static void main(String[] args) throws Exception {
 
-        //generate a new problem
+        //generate a new problem params
         double newDS=0.009;
         double newCas=0.8;
         int MaxCasForSite=100;
@@ -44,22 +44,6 @@ public class MainTest {
         System.out.println("Score: "+ greedy.getScore());
             greedy.runSimulation();
         System.out.println("Score: "+ greedy.getScore());
-
-
-
-
-
-
-
-        //read Excel Files to simulation
-//        Init newProb = new Init(amountMU,MaxCasForSite);
-//        newProb.createDisasterSite("CTTD_DisasterSite.xls","CTTD_DisasterSite");
-//        newProb.createHospitals("CTTD_Hospitals","CTTD_Hospitals");
-//        newProb.createMedicalUnits("CTTD_MedicalUnits","CTTD_MedicalUnits");
-//        System.out.println(newProb.getActiveEvent());
-//        System.out.println(newProb.getMedicalUnits());
-//        System.out.println(newProb.getDiary());
-//        System.out.println(newProb.getCasualties());
 
 
     }

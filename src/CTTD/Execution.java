@@ -12,7 +12,7 @@ public class Execution extends Skill {
         this.cas=cas;
     }
 
-    //------------------------------------getters & setters--------------------------//
+    //***getters & setters***//
     public Casualty getCas(){return  cas;}
 
     public void setCas(Casualty cas) {

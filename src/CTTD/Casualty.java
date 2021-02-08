@@ -180,6 +180,27 @@ public void setTimeToSurvive(){
         this.finiteSurvival=Probabilities.getSurvival(triage,TBorn, Tnow, status);
     }
 
+    public boolean isServiceRequired(Capacity capacity,double timeArrival){
+        //check if casualty will survive at time arrival
+        if(timeArrival>this.timeToSurvive)
+            return false;
+        else{
+            //Compare agent skills and casualty demands
+            return compareServiceCasualtyActivities(capacity);
+        }
+
+    }
+    private boolean compareServiceCasualtyActivities(Capacity capacity){
+        //check if agent skill fit to casualty
+        Vector <Skill> skills =capacity.getCapacity();
+        for(int i=0;i<getActivity().length;i++){
+            Skill s=new Skill(triage, (Activity)Array.get(getActivity(),i));
+            if(skills.contains(s))
+                return true;
+        }
+        return false;
+    }
+
 
 //    public HashMap<Casualty, Activity> getActivitiesForAgent(MedicalUnit medicalUnit){
 //        HashMap<Casualty, Activity> casualtyActivityHashMap=new HashMap<>();

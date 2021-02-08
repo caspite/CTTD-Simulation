@@ -8,11 +8,9 @@ import java.util.Map.Entry;
 import java.util.Vector;
 
 import TaskAllocation.Agent;
-import TaskAllocation.ConcaveUtility;
 import TaskAllocation.ConcaveUtilityThresholds;
-import TaskAllocation.LinearUtility;
 import TaskAllocation.Location;
-import TaskAllocation.Mailer;
+import DCOP.Mailer;
 import TaskAllocation.Message;
 import TaskAllocation.Messageable;
 import TaskAllocation.Task;
@@ -147,7 +145,7 @@ public class PoliceUnit extends Agent implements Messageable {
 
 	@Override
 	public void createMessage(Messageable task, double bid) {
-		this.mailer.createMessage(this, this.decisionCounter, task, bid);
+	//	this.mailer.createMessage(this, this.decisionCounter, task, bid);
 	}
 
 }
