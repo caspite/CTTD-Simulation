@@ -1,6 +1,10 @@
 package CTTD;
 
+import DCOP.Mailer;
 import PoliceTaskAllocation.AgentType;
+import TaskAllocation.Agent;
+import TaskAllocation.Task;
+import com.sun.source.tree.CaseTree;
 
 import java.util.*;
 
@@ -32,23 +36,48 @@ public class MainTest {
 
         GenerateProblem newProblem=new GenerateProblem(newDS,newCas,triageProbability,agentTypeProbability,amountMU,MaxCasForSite,priority);
         newProblem.generateNewProblem();
-        System.out.println(newProblem.getDisasterSites().size());
-        System.out.println(newProblem.getCasualties().size());
-        System.out.println(newProblem.getDiary().size());
-        newProblem.getDiary();
-        newProblem.getDisasterSites();
-        newProblem.getMedicalUnits();
-        newProblem.getHospitals();
+        Mailer mailer = new Mailer(newProblem.getAgents(),newProblem.getDisasterSites());
+
+        agentAndMailerMeet(newProblem.getAgents(),newProblem.getDisasterSites(),mailer);
         mainSimulation greedy =new mainSimulation(newProblem.getDiary(),newProblem.getDisasterSites(),newProblem.getMedicalUnits(),
                 newProblem.getHospitals());
         System.out.println("Score: "+ greedy.getScore());
             greedy.runSimulation();
-        System.out.println("Score: "+ greedy.getScore());
+//        PrintRemainCover(newProblem.getDisasterSites());
+//        System.out.println("Score: "+ greedy.getScore());
+//        printCasualtiesSurvival(newProblem.getCasualties());//
+
+        //mailer meet agents - task & medical units
 
 
     }
 
+    private static void PrintRemainCover( Vector<Task> disasterSite){
+        double count=0;
+        for (Task t: disasterSite){
+            System.out.println("Task: "+t.getId()+" current score: "+((DisasterSite)t).getRemainCover());
+        }
+    }
 
+    private static void printCasualtiesSurvival( Vector<Casualty> casualties){
+        double count=0;
+        for (Casualty c: casualties){
+            System.out.println("Casualty: "+c.id+" current survival: "+c.getSurvival());
+        }
+    }
+
+    static public void agentAndMailerMeet(Vector<Agent> agents,Vector<Task> tasks, Mailer mailer) {
+
+        for (Task t:tasks) {
+            t.setMailer(mailer);
+
+        }
+
+        for(Agent a:agents){
+            a.setMailer(mailer);
+        }
+
+    }
 
 
 }

@@ -64,8 +64,8 @@ public class DynamicPoliceAllocation {
 		diary.add(new EndShiftEvent(Tmax));
 		this.metrics2 = metrics2;
 		metrics = metrics2.createNewMetrics(shift);
-		this.mailer = new Mailer (MainSimulationForThreads.shift,  MainSimulationForThreads.p3,  
-				MainSimulationForThreads.p4,  MainSimulationForThreads.UB);
+//		this.mailer = new Mailer (MainSimulationForThreads.shift,  MainSimulationForThreads.p3,
+//				MainSimulationForThreads.p4,  MainSimulationForThreads.UB);
 
 	}
 

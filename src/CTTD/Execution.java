@@ -5,11 +5,13 @@ public class Execution extends Skill {
     boolean finished;//true= finished this execution
     double utility;//the estimate utility for full execution
     double penalty;//Price from abandonment
+    double lastUpdate;//the last time update
 
 
     public Execution(Triage triage, Activity activity,Casualty cas){
         super(triage,activity);
         this.cas=cas;
+        this.lastUpdate=0;
     }
 
     //***getters & setters***//

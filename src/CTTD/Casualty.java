@@ -1,5 +1,7 @@
 package CTTD;
 
+import TaskAllocation.Task;
+
 import java.lang.reflect.Array;
 import java.util.*;
 
@@ -16,6 +18,7 @@ public int id;
 public int DS_Id;
 private double initSurvival; // the init survival of the cas
 private double finiteSurvival;
+private DisasterSite disasterSite;
 
 
     public enum Status{
@@ -23,7 +26,7 @@ private double finiteSurvival;
     }
     //-------------------------constructors---------------------------------------------//
     public Casualty(){}
-    public Casualty(Triage triage,Status status,double survival,int id,int DS_ID,double TBorn)
+    public Casualty(Triage triage,Status status,double survival,int id,int DS_ID,double TBorn,DisasterSite disasterSite)
     {
         this.triage=triage;
         this.status=status;
@@ -32,6 +35,7 @@ private double finiteSurvival;
         this.DS_Id=DS_ID;
         this.TBorn=TBorn;
         this.initSurvival=survival;
+        this.disasterSite=disasterSite;
         setTimeToSurvive();
         setPriority();
     }
@@ -142,15 +146,18 @@ public void setTimeToSurvive(){
 
     //reduce set of needed activities
     public void setActivity(Activity act){
-        Activity[] temp=new Activity[activity.length-1];
-        int j=0;
-        for(int i=0;i<activity.length;i++){
-            if(!activity[i].equals(act)){
-                temp[j]=activity[i];
-                j++;
+        if(activity.length>0){
+            Activity[] temp=new Activity[activity.length-1];
+            int j=0;
+            for(int i=0;i<activity.length;i++){
+                if(!activity[i].equals(act)&&j<temp.length){
+                    temp[j]=activity[i];
+                    j++;
+                }
             }
+            activity=temp;
         }
-        activity=temp;
+
     }
 
     public void setActivitiesByStatus(){
@@ -201,6 +208,10 @@ public void setTimeToSurvive(){
         return false;
     }
 
+
+    public void updateTaskScore(){
+        disasterSite.removeCasualty(this);
+    }
 
 //    public HashMap<Casualty, Activity> getActivitiesForAgent(MedicalUnit medicalUnit){
 //        HashMap<Casualty, Activity> casualtyActivityHashMap=new HashMap<>();

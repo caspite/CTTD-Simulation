@@ -48,6 +48,8 @@ public class MedicalUnit extends Agent implements Messageable{
        isFull=false;
        casualties=new Vector<>();
        currentTaskSchedule=new TreeMap<>();
+       this.schedule=new Vector<Assignment>();
+
     }
 
 
@@ -164,8 +166,7 @@ public class MedicalUnit extends Agent implements Messageable{
         messagesToBeSent.add(newMessage);
         putMessagesInMailerMailBox();
 
-        //for a-synchrony algorithm
-        mailer.
+
     }
     public AgentMessageBox getAgentMessageBox(){return null;}
     protected void putMessagesInMailerMailBox() {

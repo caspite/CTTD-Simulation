@@ -10,6 +10,7 @@ import java.util.Vector;
 import PoliceTaskAllocation.MainSimulationForThreads;
 import PoliceTaskAllocation.PoliceUnit;
 import TaskAllocation.Agent;
+import TaskAllocation.Task;
 
 
 import java.util.ArrayList;
@@ -21,15 +22,20 @@ public class Mailer {
 	int mailerId;
 	HashMap<Agent,ArrayList<Message>> agentsMessage; //The mailer know all the agents by this map.
 	Vector<Agent> agents;
+	Vector<Task> tasks;
+	HashMap<Task,ArrayList<Message>> tasksMessage; //The mailer know all the tasks by this map.
 
 	///// ******* Constructor ******* ////
 
-	public Mailer(Vector<Agent> agents) {
+	public Mailer(Vector<Agent> agents,Vector<Task> tasks) {
 
 		this.mailerId = 1;
 		agentsMessage = new HashMap<Agent,ArrayList<Message>>();
+		tasksMessage = new HashMap<>();
 		this.agents = agents;
+		this.tasks =tasks;
 		meetAllAgents(agents);
+		meetAllTasks(tasks);
 
 	}
 
@@ -48,6 +54,23 @@ public class Mailer {
 
 
 	}
+
+	//OmerP - When initializing the problem the mailer will need to meet all the tasks.
+	protected void meetAllTasks(Vector<Task>tasks) {
+
+		for(int i = 0 ; i < tasks.size() ; i++) {
+
+			Task task = tasks.get(i);
+			ArrayList<Message> agentMessage = new ArrayList<Message>();
+			tasksMessage.put(task, agentMessage);
+
+		}
+
+
+	}
+
+
+
 
 	//OmerP - To put messages in each agent mail box.
 	protected void putMessagesInAgentsMailBox() {

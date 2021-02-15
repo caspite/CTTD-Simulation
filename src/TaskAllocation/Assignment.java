@@ -39,6 +39,7 @@ public class Assignment {
 		this.agent = medicalUnit;
 		this.task = task;
 		this.arrivalTime = arrivalTime;
+		agentAssignment=new Vector<>();
 	}
 
 	public Assignment(PoliceUnit pu, Task task, double contribution, AgentType agentType) {
@@ -47,6 +48,8 @@ public class Assignment {
 		this.agent = pu;
 		this.task = task;
 		this.type=agentType;
+		agentAssignment=new Vector<>();
+
 
 	}
 
@@ -55,6 +58,8 @@ public class Assignment {
 		this.ratio = ratio;
 		this.agent = pu;
 		this.task = task;
+		agentAssignment=new Vector<>();
+
 
 	}
 
@@ -64,6 +69,8 @@ public class Assignment {
 		this.agent = agent;
 		this.task = task;
 		this.arrivalTime = arrivalTime;
+		agentAssignment=new Vector<>();
+
 	}
 
 
@@ -75,6 +82,8 @@ public class Assignment {
 		this.agent = agent;
 		this.task = task;
 		this.arrivalTime = arrivalTime;
+		agentAssignment=new Vector<>();
+
 	}
 
 
@@ -174,7 +183,7 @@ public class Assignment {
 	}
 
 	private void calculateDuration() {
-		List<Skill> activities = new ArrayList<Skill>(agentAssignment);
+		List<Skill> activities = new ArrayList<Skill>(schedule.size());
 		for (int i = 0; i < activities.size(); i++) {
 			duration += activities.get(i).getDuration();
 		}
@@ -188,18 +197,25 @@ public class Assignment {
 	public void updateAs(double tnow){
 		//clear penalty
 		this.penalty=0;
+		Vector<Double> removeException=new Vector<>();
 
 		//loop all schedule- check finished, middle,
 		for (Map.Entry<Double,Skill> entry:schedule.entrySet()){
 			//if execution begin
 			if(entry.getKey()<tnow){
 				//if finished
-				if(entry.getKey()+entry.getValue().getDuration()<=tnow)
+				if(entry.getKey()+entry.getValue().getDuration()<=tnow){
 					finishedExecution((Execution)entry.getValue(),entry.getValue().getDuration());
+					//remove execution from schedule
+					removeException.add(entry.getKey());
+				}
+
+
 				//if in middle
 				else if (entry.getKey()+entry.getValue().getDuration()>tnow){
+
 					//calc ratio
-					double ratio=(tnow-entry.getKey()/entry.getValue().getDuration());
+					double ratio=((tnow-entry.getKey())/entry.getValue().getDuration());
 					stopExecution((Execution)entry.getValue(),ratio);
 
 				}
@@ -211,12 +227,18 @@ public class Assignment {
 
 		//update task - remove this skill from demands and update casualty
 		//else - do nothing! ( can't stop in the middle.)
-
+		if(removeException.size()>0){
+			removeExecutionFromSchedule(removeException);
+		}
 	}
 
 	private void finishedExecution(Execution execution,double endTime){
 		//close execution
 		execution.setFinished(true);
+
+		//reduce disaster site demands
+		((DisasterSite)this.task).reduceDemands(execution);
+
 		//update casualty status+activity
 		Casualty casualty=execution.getCas();
 		casualty.setActivity(execution.getActivity());
@@ -225,13 +247,15 @@ public class Assignment {
 		//reduce agent capacity
 		((MedicalUnit)this.agent).reduceCapacity(execution);
 
-		//reduce disaster site demands
-		((DisasterSite)this.task).reduceDemands(execution);
+
 
 
 		//if activity is uploading- update agent loaded casualties
 		if(execution.getActivity()==Activity.UPLOADING){
 			((MedicalUnit)this.agent).setCasualties(casualty);
+
+		}
+		if(execution.getActivity()==Activity.TRANSPORT){
 			((DisasterSite)this.task).reduceCasualties(casualty);
 		}
 		//if task is hospital task
@@ -240,14 +264,27 @@ public class Assignment {
 		((MedicalUnit) this.agent).reloadCapacity();
 		this.agent.setStatus(WAITING);
 		//TODO - Update indices
+		casualty.updateTaskScore();
 		}
 
+
 	}
+
+	private void removeExecutionFromSchedule(Vector<Double> executionKey){
+		for(int i=0;i<executionKey.size();i++){
+			Double ex =executionKey.get(i);
+			this.schedule.remove(ex);
+		}
+	}
+
+
+
 	private void stopExecution(Execution execution,double ratio){
-		execution.setPenalty((1-ratio)*execution.getUtility());
+		execution.setPenalty((1-ratio)*(execution.getUtility()+1));
 		//update assignment penalty for abandoned
 		this.penalty+=execution.getPenalty();
-
+	//update task demands
+		((DisasterSite)this.task).updateDemands();
 
 	}
 	private void updatePenalty(Execution execution){

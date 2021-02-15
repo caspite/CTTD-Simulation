@@ -72,19 +72,17 @@ public class mainSimulation {
 
 
 
-    public void runSimulation() throws Exception {
+    public void runSimulation() {
         Told = 0;
-        //printCurrentAllocation();
 
         do {
-
             currentDiaryEvent = diary.pollFirst(); // extract the next event
             printCurrentEvent();
+//            printCurrentAllocation();
             updateSimulation(currentDiaryEvent.getTime());
             if (currentDiaryEvent instanceof EndShiftEvent) {
                 break;
             }
-
             // checks event's type
             if (currentDiaryEvent instanceof NewDiaryEvent) {//new disaster site
                 oldAllocation = currentAllocation;
@@ -99,9 +97,7 @@ public class mainSimulation {
            // printCurrentAllocation();
 
         } while (Tnow < Tmax && !diary.isEmpty());
-
-
-        return;
+        printCurrentAllocation();
 
     }
 
@@ -152,16 +148,15 @@ public class mainSimulation {
     private void allocatedAgentToTask(Agent agent, Task task) {
         //allocated the agent to the task
         Assignment as = new Assignment(agent, task, 0, Tnow);
-        currentAllocation[agent.getId()].add(as);
+        currentAllocation[agent.returnIndex()].add(as);
         agent.setCurrentTask(as);
-
         //update available agent
         reduceAvailableAgent(agent);
-        //update agent location, status and create agent arrive to event diary event
+
         moveUnit(as);
     }
 
-    //---------------- handel agent arrive to task event-----------------------------------//
+    //*** handel agent arrive to task event ***//
 
     /***
      *     agent arrives to the task
@@ -174,19 +169,16 @@ public class mainSimulation {
             //if is the first agent - information task
             if (!as.getTask().isStarted()) {
                 as.getTask().setStarted(true);
-                as.setActivity(Activity.INFO);
-                as.setEndTime(as.getTask().getHardConstraintTime());
-                //create agent leave event
-                createLeavingEvent(as);
-            } else {
+//                as.setActivity(Activity.INFO);
+//                as.setEndTime(as.getTask().getHardConstraintTime());
+//                //create agent leave event
+//                createLeavingEvent(as);
+            }
                 activitiesAssignment(as);
                 //if agent not working
                 if(as.getAgent().getStatus()== WAITING){
                     addAvailableAgent(as.getAgent());
                     solveGreedyAlgorithm();
-                    return;
-                }
-
                 createLeavingEvent(as);
             }
         }
@@ -197,6 +189,7 @@ public class mainSimulation {
         // agent no longer on the way
         as.getAgent().setOnTheWay(false);
         as.getAgent().setLocation(as.getTask().getLocation());
+        createLeavingEvent(as);
 
     }
 
@@ -307,14 +300,6 @@ public class mainSimulation {
 
 
 
-
-
-
-
-
-
-
-
     //--------------------------helpers-------------------------------------------------//
 
     /***
@@ -328,7 +313,6 @@ public class mainSimulation {
         for(Agent a: medicalUnits){
             a.upateAgent(tnow);
             //clear diary events
-
         }
 
 
@@ -363,6 +347,8 @@ public class mainSimulation {
         System.out.println("");
 
     }
+
+
 
     /***
      *    creates leaving event and update agent status to working/patroling

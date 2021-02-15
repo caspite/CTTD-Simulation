@@ -5,6 +5,7 @@ import PoliceTaskAllocation.AgentType;
 import PoliceTaskAllocation.DiaryEvent;
 import PoliceTaskAllocation.MissionEvent;
 import PoliceTaskAllocation.NewDiaryEvent;
+import TaskAllocation.Agent;
 import TaskAllocation.Location;
 import TaskAllocation.Task;
 
@@ -36,6 +37,8 @@ public class GenerateProblem {
     private TreeMap<Double,AgentType> agentTypeProbability;; // the probability for each MU type - upto1
     private int amountMU; // the MU amount
     Vector<MedicalUnit> MedicalUnits=new Vector<MedicalUnit>();
+    Vector<Agent> agents=new Vector<Agent>();
+
 
     //Hospitals params
     private int amountHospitals; // the MU amount
@@ -89,15 +92,28 @@ public class GenerateProblem {
 
     private void CreateCas(Triage trg,int ID){
         double survival = Probabilities.getSurvival(trg,Tnow,Tnow);
-        Casualties.add(new Casualty(trg, Casualty.Status.WATING,survival,ID,DS_ID,Tnow));
-        tempCasualties.add(new Casualty(trg, Casualty.Status.WATING,survival,ID,DS_ID,Tnow));
+        DisasterSite ds=(DisasterSite) getDisasterSiteById(ID);
+
+        Casualties.add(new Casualty(trg, Casualty.Status.WATING,survival,ID,DS_ID,Tnow,ds));
+        tempCasualties.add(new Casualty(trg, Casualty.Status.WATING,survival,ID,DS_ID,Tnow,ds));
+    }
+    private Task getDisasterSiteById(int id){
+        for(Task ds:DisasterSites){
+            if (ds.getId()==id){
+                return ds;
+            }
+
+        }
+        return null;
     }
 
     private void CreateMU(AgentType agt,int ID){
         //agent location
         Random rnd=new Random(130*ID);
         Location loc=Distance.randomLocation(rnd);
-        MedicalUnits.add(new MedicalUnit(ID,agt,loc));
+        Agent mu =new MedicalUnit(ID,agt,loc);
+        MedicalUnits.add((MedicalUnit) mu);
+        agents.add(mu);
         }
 
     private void CreateHospital(int id){
@@ -243,6 +259,10 @@ public class GenerateProblem {
     public Vector<Task> getDisasterSites(){
         return DisasterSites;
     }
+    public Vector<Agent> getAgents(){
+        return agents;
+    }
+
 
     public TreeSet<DiaryEvent> getDiary(){return diary;}
 

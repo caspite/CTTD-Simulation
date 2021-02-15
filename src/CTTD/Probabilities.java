@@ -47,7 +47,7 @@ public class Probabilities {
                 throw new IllegalStateException("Unexpected value: " + triage);
         }
         double Tnow;
-        //Tnow = Math.pow(1,(1/B2))*B1+Tborn;
+        double prop  = Math.pow(1,(1/B2))*B1+Tborn;
         Tnow=50+Tborn;
 
             return Tnow;

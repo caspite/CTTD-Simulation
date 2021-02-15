@@ -174,13 +174,14 @@ public class Init {
             Triage trg;
             double survival;
             double Tborn=0;
+            DisasterSite ds=null;
             String[] sC = xlReaderC.rowReading(k);
             if(Integer.parseInt(sC[1])==disasterSiteID) {
                 trg = Triage.valueOf(sC[4]);
                 survival = Double.parseDouble(sC[3]);
                 Cid = Integer.parseInt(sC[0]);
                 Tborn=Double.parseDouble(sC[2]);
-                casualties.add(new Casualty(trg, Casualty.Status.WATING, survival, Cid,disasterSiteID,Tborn));
+                casualties.add(new Casualty(trg, Casualty.Status.WATING, survival, Cid,disasterSiteID,Tborn,ds));
             }
 
         }

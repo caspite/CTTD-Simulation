@@ -7,6 +7,7 @@ import CTTD.Activity;
 import CTTD.Triage;
 import CTTD.TriageActivity;
 import DCOP.AgentMessageBox;
+import DCOP.Mailer;
 import Helpers.URLConnectionReader;
 import PoliceTaskAllocation.*;
 
@@ -30,6 +31,10 @@ public class Agent implements Distancable, Serializable {
 	//For CTTD agent Type is the agets' Type - not the capabilities
 	protected HashSet<AgentType> agentType; // agents' capabilities
 
+	protected Mailer mailer;
+
+
+	//*** Constructors ***//
 	public Agent(Location location, int id, HashSet<AgentType> agentType) {
 		super();
 		this.location = location;
@@ -37,11 +42,15 @@ public class Agent implements Distancable, Serializable {
 		this.agentType = agentType;
 		this.currentTask =  null;
 		this.speed = 60;
+		this.schedule=new Vector<Assignment>();
 	}
-	public Agent(){};
+	public Agent(){
+	};
 	public Agent(int id, HashSet<AgentType> agentType) {
 		this(null, id, agentType);
 		this.speed = 60;
+		this.schedule=new Vector<Assignment>();
+
 	}
 
 	public HashSet<AgentType> getAgentType() {
@@ -67,6 +76,7 @@ public class Agent implements Distancable, Serializable {
 	public void setCurrentTask(Assignment currentTask) {
 		this.currentTask = currentTask;
 		this.currentTaskID = currentTask.getTask().getId();
+		this.schedule.add(currentTask);
 	}
 
 	public boolean isOnTheWay() {
@@ -105,6 +115,11 @@ public class Agent implements Distancable, Serializable {
 
 	public int getId() {
 		return id;
+	}
+	public int returnIndex() {
+		String str=String.valueOf(this.id);
+		int index = Integer.parseInt(str.substring(1));
+		return index;
 	}
 
 	@Override
@@ -173,6 +188,7 @@ public class Agent implements Distancable, Serializable {
 		this.movingTime = movingTime;
 	}
 
+
 	public int getCurrentTaskID() {
 		return currentTaskID;
 	}
@@ -191,4 +207,10 @@ public void upateAgent(double tnow){
 
 	public AgentMessageBox getAgentMessageBox(){return null;}
 
+	//*** getters && setters ***//
+
+
+	public void setMailer(Mailer mailer) {
+		this.mailer = mailer;
+	}
 }

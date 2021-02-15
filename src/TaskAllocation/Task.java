@@ -547,6 +547,10 @@ public class Task implements Distancable, Serializable, Comparable<Task>, Messag
 		return this.taskChange;
 	}
 
+//*** getters && setters ***//
 
-		
+
+	public void setMailer(Mailer mailer) {
+		this.mailer = mailer;
+	}
 }

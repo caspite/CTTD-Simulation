@@ -47,7 +47,7 @@ public class FisherDistributedCA {
 	// algorithm
 	public Double[][] algorithm() {
 		do {
-			iterate();
+			//iterate();
 			numberOfIteration++;
 		} while (!isStable());
 		return createCentralisticAllocation();
@@ -84,13 +84,13 @@ public class FisherDistributedCA {
 		return ans;
 	}
 
-	public Double[][] iterate() {
-		List<Message> msgToSend = mailer.handleDelay();
-		Map<Messageable, List<Message>> receiversMap = createReciversMap(msgToSend);
-		sendMessages(receiversMap);
-		updateStability();
-		return createCentralisticAllocation();
-	}
+//	public Double[][] iterate() {
+//		List<Message> msgToSend = mailer.handleDelay();
+//		Map<Messageable, List<Message>> receiversMap = createReciversMap(msgToSend);
+//		sendMessages(receiversMap);
+//		updateStability();
+//		return createCentralisticAllocation();
+//	}
 
 	private void updateStability() {
 		this.changes = 0;
