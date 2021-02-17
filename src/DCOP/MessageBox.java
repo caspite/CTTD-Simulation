@@ -5,14 +5,14 @@ import java.awt.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class AgentMessageBox {
+public class MessageBox {
 
     int agentId;
     HashMap<Integer, Message> messages;
 
     ///// ******* Constructor ******* ////
 
-    public AgentMessageBox(int agentId) {
+    public MessageBox(int agentId) {
 
         this.agentId = agentId;
         this.messages = new HashMap<Integer, Message>();

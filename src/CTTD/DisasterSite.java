@@ -1,6 +1,7 @@
 package CTTD;
 
 import CttdSolver.FirstMessage;
+import CttdSolver.ServiceMessage;
 import CttdSolver.UtilityMessage;
 import DCOP.*;
 import PoliceTaskAllocation.AgentType;
@@ -13,7 +14,7 @@ import java.lang.reflect.Array;
 import java.util.*;
 
 
-public class DisasterSite extends MissionEvent {
+public class DisasterSite extends MissionEvent  {
 
   private boolean isInformed;//complete info activity
   protected ArrayList<Casualty> casualties= new ArrayList();  //casualties list
@@ -24,11 +25,15 @@ public class DisasterSite extends MissionEvent {
   private boolean finished;
 
   //*** Message Variables ***//
-  AgentMessageBox agentMessageBox;
+  MessageBox messageBox;// income last message from each agent
+  Vector<Message> messageToBeSent;
 
   //*** allocation variables ***//
-  HashMap<Integer,Vector<Execution>> currentAllocation;
-  HashMap<Integer,Vector<Execution>> waitingAllocation;
+  HashMap<Integer,Vector<Execution>> currentAllocation;//agents id,  execution - after confirm message
+  HashMap<Agent,Double> relevantAgentsTimeArrival;//relevant agents and time arrival according to confirm massage -1 for non allocation
+  HashMap<Agent,Double> utilityForAgent;
+
+
 
 //----------------------------------methods---------------------------------------------------//
 
@@ -224,13 +229,18 @@ public void updateDemands(){
   public TreeMap<Double,Skill> activitiesAssignment(Assignment as) {
     TreeMap<Double,Skill> activitiesAssignment=new TreeMap<>();//the return
     MedicalUnit mu= (MedicalUnit)as.getAgent();//the agent
-    double capacity = mu.skills.getCurrentScore();//the agent capacity//TODO potential bug!! check if update capacity --> agent skills
-    Vector<Skill> skills = mu.getAgentSkills().getCapacity();//agent free skills
+    Capacity capacity = mu.getAgentSkills();//agent free skills
     double time=as.getArrivalTime();//the current start time for each activity
+    if(isAgentRequired(mu,time)){
+      activitiesAssignment = allocateSkillsToCasualties(capacity,time);
+    }
+    return activitiesAssignment;
+  }
 
-    //if agent required to the task
-    if(isAgentRequired(mu,as.getArrivalTime()))
-    {
+  private TreeMap<Double,Skill>  allocateSkillsToCasualties(Capacity capacity,double time){
+    TreeMap<Double,Skill> activitiesAssignment=new TreeMap<>();//the return
+    double capacityScore = capacity.getCurrentScore();//the agent capacity//TODO potential bug!! check if update capacity --> agent skills
+
       //start with the urgent casualty
       this.sortCasualtiesBySurvival();
       for(int i=0; i< casualties.size();i++){
@@ -238,33 +248,29 @@ public void updateDemands(){
         Casualty cas=casualties.get(i);
         Activity[] activity=cas.getActivity();
         //if agent have free capacity
-        if(capacity>0) {
+        if(capacityScore>0) {
           if (cas.status != Casualty.Status.FINISHED) {
             //check if agent skills and time arrival is relevant
-            if (cas.isAgentRequired(mu, time)) {
               //while tha cas has open activities
-              while(j<activity.length&&capacity>0){
+              while(j<activity.length&&capacityScore>0){
                 //get cas next activity
                 Activity act = activity[activity.length-(1+j)];
                 //check if the agent skill contains the demand and add to the HashMap
-                Skill s = new Execution(cas.getTriage(), act,cas);
-                if (isContains(s,skills)&&this.demands.contains(s)) {
+                Skill s = new Execution(cas.getTriage(), act,cas,time);
+                if (isContains(s,capacity.getCapacity())&&this.demands.contains(s)) {
                   activitiesAssignment.put(time,s);
                   //reduce agent capacity
-                  capacity-=s.getScore();
+                  capacityScore-=s.getScore();
                   //set time
                   time+=s.getDuration();
                   //update site demands
                   this.reduceDemands(s);
                 }
                 j++;
-//                System.out.println("Agent: "+mu.getId()+" cas id: "+cas.id+" act: "+act);
               }
-            }
           }
         }
       }
-    }
 
     return activitiesAssignment;
   }
@@ -289,18 +295,59 @@ public void updateDemands(){
 
   //*** Message Methods ***//
 
+
+
+
+
+
+
+  //*** SPCN methods ***//
+
+
+
+
+  public void CreateNewMessageSPCN(){
+    messageToBeSent.clear();
+    updateAgentsTimeArrivalMap();
+    //sort all the relevant agents by the time arrival
+    HashMap<Agent,Double> sortedAgentsByTimeArrival =sortByValue(relevantAgentsTimeArrival);
+
+    for(Agent agent: sortedAgentsByTimeArrival.keySet()){
+    Message message = messageBox.getMessages().get(agent.getId());
+      createUtilityMessage(message);//execution is null if agent not relevant
+    }
+    putMessageInMailer();
+
+  }
+
+  private void updateAgentsTimeArrivalMap(){
+
+    for(Agent agent:this.relevantAgentsTimeArrival.keySet()){
+      Message message = messageBox.getMessages().get(agent.getId());
+     double timeArrival= ((ServiceMessage)message).getTimeArrival();
+     relevantAgentsTimeArrival.replace(agent,timeArrival);
+    }
+
+  }
+
+  public void putMessageInMailer(){}
+
+  private void readAllMessages(){}
+
+
   public void createUtilityMessage(Message message){
-    Vector<Skill> executions = calcExecution(((FirstMessage)message).getCapacity(),((FirstMessage)message).getTimeArrival());
+    Vector<Skill> executions = calcExecution(((ServiceMessage)message).getCapacity(),((ServiceMessage)message).getTimeArrival());
     double utility =calcUtility(executions);
     Message newMessage = new UtilityMessage(this.id,message.getSenderId(),utility,executions);
-
+    messageToBeSent.add(newMessage);
   }
 
   private Vector<Skill> calcExecution(Capacity capacity,double timeArrival){
     Vector<Skill> executions =new Vector<>();
     //check if the agent relevant
-    if(isServiceRequired(capacity,timeArrival)){
-      executions =solverGreedyAssignment(capacity,timeArrival);
+    if(isServiceRequired(capacity,timeArrival)&&timeArrival>-1){
+      executions = new Vector<>();
+      executions.addAll(allocateSkillsToCasualties(capacity,timeArrival).values());
     }
     else
       return null;
@@ -320,40 +367,6 @@ public void updateDemands(){
     return false;
   }
 
-  public Vector<Skill> solverGreedyAssignment(Capacity capacity,double timeArrival) {
-    Vector<Skill> execution=new Vector<>();
-    //start with the urgent casualty - greedy
-    this.sortCasualtiesBySurvival();
-    for (int i = 0; i < casualties.size(); i++) {
-      int j = 0;
-      Casualty cas = casualties.get(i);
-      Activity[] activity = cas.getActivity();
-      //if agent have free capacity
-      if (capacity.getCurrentScore() > 0) {
-        if (cas.status != Casualty.Status.FINISHED) {
-          //check if agent skills and time arrival is relevant
-          if (cas.isServiceRequired(capacity, timeArrival)) {
-            //while tha cas has open activities
-            while (j < activity.length && capacity.getCurrentScore() > 0) {
-              //get cas next activity
-              Activity act = activity[j];
-              //check if the agent skill contains the demand and add to the execution
-              Skill s = new Execution(cas.getTriage(), act, cas);
-              if (capacity.getCapacity().contains(s)) {
-                execution.add(s);
-                //reduce capacity
-                capacity.reduceCap(s.getTriage(),s.getActivity());
-                //set time
-                timeArrival += s.getDuration();
-              }
-            }
-          }
-        }
-      }
-
-    }
-    return execution;
-  }
 
   private double calcUtility(Vector<Skill> executions){
     double utility=0;
@@ -362,11 +375,40 @@ public void updateDemands(){
     }
     else{
       for(Skill ex:executions){
-       utility+= ((Execution)ex).getUtility();
+        utility+= ((Execution)ex).getUtility();
       }
     }
     return utility;
   }
+
+
+
+  public static HashMap<Agent, Double> sortByValue(HashMap<Agent, Double> hm)
+  {
+    // Create a list from elements of HashMap
+    List<Map.Entry<Agent, Double> > list =
+            new LinkedList<Map.Entry<Agent, Double> >(hm.entrySet());
+
+    // Sort the list
+    Collections.sort(list, new Comparator<Map.Entry<Agent, Double> >() {
+      public int compare(Map.Entry<Agent, Double> o1,
+                         Map.Entry<Agent, Double> o2)
+      {
+        return (o1.getValue()).compareTo(o2.getValue());
+      }
+    });
+
+    // put data from sorted list to hashmap
+    HashMap<Agent, Double> temp = new LinkedHashMap<Agent, Double>();
+    for (Map.Entry<Agent, Double> aa : list) {
+      temp.put(aa.getKey(), aa.getValue());
+    }
+    return temp;
+  }
+
+
+
+
 
 
   public String toString(){

@@ -1,7 +1,7 @@
 package CTTD;
 
 import CttdSolver.FirstMessage;
-import DCOP.AgentMessageBox;
+import DCOP.MessageBox;
 import DCOP.Mailer;
 import DCOP.Message;
 import PoliceTaskAllocation.AgentType;
@@ -21,7 +21,7 @@ public class MedicalUnit extends Agent implements Messageable{
 
 
     //***Messages Variables***//
-    AgentMessageBox agentMessageBox;
+    MessageBox agentMessageBox;
     ArrayList<Message> messagesToBeSent;
     Mailer mailer;
 
@@ -168,7 +168,7 @@ public class MedicalUnit extends Agent implements Messageable{
 
 
     }
-    public AgentMessageBox getAgentMessageBox(){return null;}
+    public MessageBox getAgentMessageBox(){return null;}
     protected void putMessagesInMailerMailBox() {
 
         mailer.collectMailFromAgent(this, messagesToBeSent);

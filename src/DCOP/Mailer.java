@@ -1,21 +1,13 @@
 package DCOP;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
 import java.util.Vector;
 
-import PoliceTaskAllocation.MainSimulationForThreads;
-import PoliceTaskAllocation.PoliceUnit;
 import TaskAllocation.Agent;
 import TaskAllocation.Task;
 
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Vector;
 
 public class Mailer {
 
@@ -73,7 +65,7 @@ public class Mailer {
 
 
 	//OmerP - To put messages in each agent mail box.
-	protected void putMessagesInAgentsMailBox() {
+	public void putMessagesInAgentsMailBox() {
 
 		for(Agent senderAgent: agentsMessage.keySet()) {
 
@@ -84,7 +76,7 @@ public class Mailer {
 				Message messageToBeSent = messagesToBeSent.get(i);
 				int receiverId = messageToBeSent.getReceiverId();
 				Agent agent = agents.get(receiverId);
-				AgentMessageBox agentMessageBox = agent.getAgentMessageBox();
+				MessageBox agentMessageBox = agent.getAgentMessageBox();
 				agentMessageBox.receiveMessageFromMailer(messageToBeSent);
 
 			}

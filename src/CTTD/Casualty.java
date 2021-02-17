@@ -51,6 +51,14 @@ public void setTimeToSurvive(){
         this.timeToSurvive= Probabilities.getTimeToSurvive(this.triage,this.TBorn);
 }
 
+public double getSurvivalByTime(double time){
+        double survival=this.survival;
+        Probabilities.getSurvival(this.triage,this.TBorn,time);
+
+    return survival;
+
+}
+
     public void setPriority() {
         switch (triage) {
             case URGENT:

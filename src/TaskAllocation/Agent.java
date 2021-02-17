@@ -6,7 +6,7 @@ import java.util.*;
 import CTTD.Activity;
 import CTTD.Triage;
 import CTTD.TriageActivity;
-import DCOP.AgentMessageBox;
+import DCOP.MessageBox;
 import DCOP.Mailer;
 import Helpers.URLConnectionReader;
 import PoliceTaskAllocation.*;
@@ -205,7 +205,7 @@ public void upateAgent(double tnow){
 		}
 }
 
-	public AgentMessageBox getAgentMessageBox(){return null;}
+	public MessageBox getAgentMessageBox(){return null;}
 
 	//*** getters && setters ***//
 
