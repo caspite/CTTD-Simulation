@@ -17,7 +17,7 @@ public abstract class Solver {
 
     protected Solver(){}
 
-    protected abstract void createConstraintGraph();
+    protected abstract void createConstraintGraph(double tnow);
 
     protected abstract Vector<Assignment> solve();
 

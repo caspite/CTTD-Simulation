@@ -23,4 +23,15 @@ public class UtilityMessage extends Message {
         this.execution=execution;
 
     }
+
+
+    //*** getters && setters ***//
+
+    public double getUtility() {
+        return utility;
+    }
+
+    public Vector<Skill> getExecution() {
+        return execution;
+    }
 }

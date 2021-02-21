@@ -40,7 +40,7 @@ public class MainTest {
 
         agentAndMailerMeet(newProblem.getAgents(),newProblem.getDisasterSites(),mailer);
         mainSimulation greedy =new mainSimulation(newProblem.getDiary(),newProblem.getDisasterSites(),newProblem.getMedicalUnits(),
-                newProblem.getHospitals());
+                newProblem.getHospitals(),1,mailer);
         System.out.println("Score: "+ greedy.getScore());
             greedy.runSimulation();
 //        PrintRemainCover(newProblem.getDisasterSites());

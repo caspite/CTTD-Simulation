@@ -42,6 +42,15 @@ public class Assignment {
 		agentAssignment=new Vector<>();
 	}
 
+	public Assignment(MedicalUnit medicalUnit, Task task, double contribution, double arrivalTime,Vector<Skill> agentAssignment) {
+		super();
+		this.contribution = contribution;
+		this.agent = medicalUnit;
+		this.task = task;
+		this.arrivalTime = arrivalTime;
+		this.agentAssignment=agentAssignment;
+	}
+
 	public Assignment(PoliceUnit pu, Task task, double contribution, AgentType agentType) {
 		super();
 		this.contribution = contribution;

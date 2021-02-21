@@ -1,5 +1,7 @@
 package CTTD;
 
+import CttdSolver.SpcnDcop;
+import DCOP.Mailer;
 import Helpers.Metrics;
 import Helpers.MetricsSummary;
 import PoliceTaskAllocation.*;
@@ -27,9 +29,12 @@ public class mainSimulation {
     protected Vector<Agent> availableAgent;
     protected Vector<Hospital> hospitals;
 
-    protected int numOfPatrols = 1;
+    protected int numOfPatrols = 0;
     protected double Tnow, Told, pow = 0.9;// current time of the simulation
     public static final double Tmax = 8000;// the end time of the simulation
+
+    int algorithmType=1; //0- greedy 1-SpcnDcop
+    Mailer mailer;
 
 
 
@@ -43,6 +48,22 @@ public class mainSimulation {
         this.hospitals = hos;
         this.allEventsForAllocation = activeEvents;
 
+        createFirstAllocation();
+        checkNewAllocation();
+
+        diary.add(new EndShiftEvent(Tmax));
+
+        //this.metrics2 = metrics2;
+        //metrics = metrics2.createNewMetrics(1);
+    }
+    public mainSimulation(TreeSet<DiaryEvent> diary,
+                          Vector<Task> activeEvents, Vector<MedicalUnit> mu, Vector<Hospital> hos,int algorithmType,Mailer mailer) {
+        this.medicalUnits = mu;
+        this.diary = diary;
+        this.hospitals = hos;
+        this.allEventsForAllocation = activeEvents;
+        this.algorithmType=algorithmType;
+        this.mailer=mailer;
         createFirstAllocation();
         checkNewAllocation();
 
@@ -111,7 +132,15 @@ public class mainSimulation {
      */
     private void handleNewEvent() {
         activeEvents.add(currentDiaryEvent.getEvent());
-        solveGreedyAlgorithm();
+        switch (algorithmType){
+            case 0:
+                solveGreedyAlgorithm();
+                break;
+            case 1:
+                solveSpcnDcop();
+                break;
+
+        }
     }
 
     /***
@@ -140,6 +169,25 @@ public class mainSimulation {
         }
     }
 
+    public void solveSpcnDcop(){
+        SpcnDcop s=new SpcnDcop(this.availableAgent,this.activeEvents,this.mailer,this.Tnow);
+        s.createConstraintGraph(Tnow);
+        Vector<Assignment> newAllocation = s.solve();
+        updateCurrentAllocation(newAllocation);
+    }
+
+    private void updateCurrentAllocation(Vector<Assignment> allocation){
+        for(Assignment as:allocation){
+            //TODO- if reallocate - remove previous diary event for this agent
+            Agent agent = as.getAgent();
+            currentAllocation[agent.getId()].add(as);
+            agent.setCurrentTask(as);
+            //update available agent
+            reduceAvailableAgent(agent);
+            moveUnit(as);
+        }
+    }
+
     /***
      * task allocation phase phase - allocated agent to task
      * @param agent
@@ -148,7 +196,7 @@ public class mainSimulation {
     private void allocatedAgentToTask(Agent agent, Task task) {
         //allocated the agent to the task
         Assignment as = new Assignment(agent, task, 0, Tnow);
-        currentAllocation[agent.returnIndex()].add(as);
+        currentAllocation[agent.getId()].add(as);
         agent.setCurrentTask(as);
         //update available agent
         reduceAvailableAgent(agent);
@@ -178,7 +226,14 @@ public class mainSimulation {
                 //if agent not working
                 if(as.getAgent().getStatus()== WAITING){
                     addAvailableAgent(as.getAgent());
-                    solveGreedyAlgorithm();
+                    switch (algorithmType){
+                        case 0:
+                            solveGreedyAlgorithm();
+                            break;
+                        case 1:
+                            solveSpcnDcop();
+                            break;
+                    }
                 createLeavingEvent(as);
             }
         }
@@ -224,8 +279,14 @@ public class mainSimulation {
             //add agent to available agent and call the greedy algorithm
             mu.setStatus(WAITING);
             addAvailableAgent(mu);
-            solveGreedyAlgorithm();
-        }
+            switch (algorithmType){
+                case 0:
+                    solveGreedyAlgorithm();
+                    break;
+                case 1:
+                    solveSpcnDcop();
+                    break;
+            }        }
         if(((DisasterSite)as.getTask()).finished()){
             removeTaskFromActiveEvent(as.getTask());
         }
@@ -295,8 +356,14 @@ public class mainSimulation {
         addAvailableAgent(mu);
         mu.setCurrentTask(currentDiaryEvent.getAssignment());
         //call greedy algorithm
-        solveGreedyAlgorithm();
-    }
+        switch (algorithmType){
+            case 0:
+                solveGreedyAlgorithm();
+                break;
+            case 1:
+                solveSpcnDcop();
+                break;
+        }    }
 
 
 
@@ -537,6 +604,11 @@ public class mainSimulation {
 
     }
 
+    //*** getters && setters ***//
+
+    public void setMailer(Mailer mailer) {
+        this.mailer = mailer;
+    }
 
 
     //-------------- unused functions--------------------------------//

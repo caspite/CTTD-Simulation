@@ -30,7 +30,12 @@ public class Execution extends Skill {
         double currentSurvival= cas.getSurvival();
     //take the estimate survival at the end time of the execution
         double endSurvival =cas.getSurvivalByTime(this.startTime+this.getDuration());
-    this.utility=currentSurvival-endSurvival;
+    this.utility=currentSurvival-endSurvival-this.penalty;
+    }
+
+
+    public void updatePenalty(){
+        this.penalty=this.utility;
     }
 
     //***getters & setters***//

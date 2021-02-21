@@ -152,7 +152,7 @@ public class GenerateProblem {
             int priority = setPriority();
             if (this.newDS > rnd) {
                 DS_ID += 1;
-                int disasterSiteId =calcId(1,DS_ID);
+                int disasterSiteId =DS_ID;
                 CreateDS(disasterSiteId,priority);
 
                 rnd = rNewCas.nextDouble();
@@ -199,7 +199,7 @@ public class GenerateProblem {
                 agt = agentTypeProbability.get((double) prop[2]);
             }
            //calc the Id
-            int id = calcId(2,i);
+            int id = i;
             CreateMU(agt, id);
         }
         CreateHospital(calcId(3,1));

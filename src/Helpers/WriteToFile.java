@@ -3,11 +3,8 @@ package Helpers;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.TreeMap;
-import java.util.Vector;
 
 import CTTD.Casualty;
 import CTTD.MedicalUnit;
@@ -61,6 +58,30 @@ public class WriteToFile {
 			System.err.println("Couldn't write to file");
 		}
 	}
+
+	public static void writeOutput(String fileName, HashMap<Integer, Double> output1, String algorithm) {
+		try {
+
+
+			BufferedWriter out = openFile2(fileName);
+			String o = "" + algorithm;
+			out.write(o);
+			out.newLine();
+			o="iteration"+","+"global cost";
+			out.write(o);
+			out.newLine();
+
+			for (Integer it : output1.keySet()) {
+				o = "" + it + "," + output1.get(it);
+				out.write(o);
+				out.newLine();
+			}
+			out.close();
+		} catch (IOException e) {
+			System.err.println("Couldn't write to file");
+		}
+	}
+
 	/// write to file fishers algorithm output
 	public static void writeFisherOutpuToFile(Double[][] ds) {
 		try {

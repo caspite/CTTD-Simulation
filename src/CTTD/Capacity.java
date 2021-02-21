@@ -19,6 +19,9 @@ public class Capacity {
         currentScore=maxScore;
 
     }
+    public Capacity(Vector<Skill> skills){
+        this.capacity=skills;
+    }
 
     public void initializeCapacity(AgentType type){
         int urgent=0;

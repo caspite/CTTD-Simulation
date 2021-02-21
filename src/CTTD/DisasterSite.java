@@ -9,6 +9,7 @@ import PoliceTaskAllocation.MissionEvent;
 import TaskAllocation.Agent;
 import TaskAllocation.Assignment;
 import TaskAllocation.Location;
+import TaskAllocation.Messageable;
 
 import java.lang.reflect.Array;
 import java.util.*;
@@ -19,8 +20,9 @@ public class DisasterSite extends MissionEvent  {
   private boolean isInformed;//complete info activity
   protected ArrayList<Casualty> casualties= new ArrayList();  //casualties list
   private double remainCover;//the current score of the disaster site according to casualties
+  private double remainCoverByCurrentAllocation;
   private double initScore;// the init disaster site score
-  private Vector <Skill> demands;//the disaster site demands according to casualties
+  private Vector <Skill> demands;//the disaster site demands to casualties
   private TreeMap<Double, Skill> activitiesSchedule;
   private boolean finished;
 
@@ -31,7 +33,7 @@ public class DisasterSite extends MissionEvent  {
   //*** allocation variables ***//
   HashMap<Integer,Vector<Execution>> currentAllocation;//agents id,  execution - after confirm message
   HashMap<Agent,Double> relevantAgentsTimeArrival;//relevant agents and time arrival according to confirm massage -1 for non allocation
-  HashMap<Agent,Double> utilityForAgent;
+  HashMap<Agent,Double> relevantAgentsUtility;
 
 
 
@@ -47,7 +49,10 @@ public class DisasterSite extends MissionEvent  {
     super(location,id,startTime);
     this.missionArrivalTime=startTime;
     this.finished=false;
-
+    relevantAgentsUtility=new HashMap<>();
+    relevantAgentsTimeArrival=new HashMap<>();
+    messageToBeSent=new Vector<>();
+    messageBox=new MessageBox(this.id);
   }
   public DisasterSite(Location location, double duration, double startTime, int id,
                       int priority, double utility,
@@ -62,6 +67,10 @@ public class DisasterSite extends MissionEvent  {
     super(location,id,startTime);
 //    this.initializeTriageNum();
     this.finished=false;
+    relevantAgentsUtility=new HashMap<>();
+    relevantAgentsTimeArrival=new HashMap<>();
+    messageBox=new MessageBox(this.id);
+
 
   }
   //-------------------------------getters and setters---------------------------//
@@ -145,7 +154,12 @@ public class DisasterSite extends MissionEvent  {
   }
 
   public double getRemainCover(){return remainCover;}
-//----------------------------------------------------------------------------//
+
+  public double getRemainCoverByCurrentAllocation() {
+    return remainCoverByCurrentAllocation;
+  }
+
+  //----------------------------------------------------------------------------//
 
   private void updateActivitiesSchedule(double time,Skill skill){
     activitiesSchedule.put(time,skill);
@@ -203,6 +217,7 @@ public void updateDemands(){
       demands.add(new Skill(trg, a));
     }
   }
+  remainCoverByCurrentAllocation=remainCover;
 }
   private double AgentTimeToTravel(MedicalUnit medicalUnit){
 
@@ -293,31 +308,49 @@ public void updateDemands(){
 
   }
 
-  //*** Message Methods ***//
 
-
-
-
-
-
+//*** Message Box ***//
+public MessageBox getAgentMessageBox() {
+  return messageBox;
+}
 
   //*** SPCN methods ***//
 
 
+  public void createFirstMessages(){
+    for(Agent agent: relevantAgentsTimeArrival.keySet()){
+      Message newMessage = new UtilityMessage(this.id,agent.getId(),-1,null);
+      messageToBeSent.add(newMessage);
+    }
+    putMessageInMailer();
 
 
-  public void CreateNewMessageSPCN(){
+  }
+  public void createNewMessageSPCN(){
     messageToBeSent.clear();
+    updateDemands();//update the demands according to casualties on site
+
     updateAgentsTimeArrivalMap();
     //sort all the relevant agents by the time arrival
     HashMap<Agent,Double> sortedAgentsByTimeArrival =sortByValue(relevantAgentsTimeArrival);
 
     for(Agent agent: sortedAgentsByTimeArrival.keySet()){
     Message message = messageBox.getMessages().get(agent.getId());
-      createUtilityMessage(message);//execution is null if agent not relevant
+     double utility= createUtilityMessage(message);//execution is null if agent not relevant
+      updateAgentsUtility(agent,utility);
+      updateRemainCoverByCurrentAllocation(utility);
     }
+
     putMessageInMailer();
 
+  }
+
+  private void updateRemainCoverByCurrentAllocation(double utility){
+    remainCoverByCurrentAllocation-=utility;
+  }
+
+  private void updateAgentsUtility(Agent agent,double utility){
+    this.relevantAgentsUtility.replace(agent,utility);
   }
 
   private void updateAgentsTimeArrivalMap(){
@@ -330,16 +363,17 @@ public void updateDemands(){
 
   }
 
-  public void putMessageInMailer(){}
+  public void putMessageInMailer(){
+    this.mailer.collectMailFromTask(this,messageToBeSent);
+  }
 
-  private void readAllMessages(){}
-
-
-  public void createUtilityMessage(Message message){
+  public double createUtilityMessage(Message message){
     Vector<Skill> executions = calcExecution(((ServiceMessage)message).getCapacity(),((ServiceMessage)message).getTimeArrival());
     double utility =calcUtility(executions);
+
     Message newMessage = new UtilityMessage(this.id,message.getSenderId(),utility,executions);
     messageToBeSent.add(newMessage);
+    return utility;
   }
 
   private Vector<Skill> calcExecution(Capacity capacity,double timeArrival){
@@ -356,7 +390,7 @@ public void updateDemands(){
 
   public boolean isServiceRequired(Capacity skills, double timeArrival){
     //check time arrival
-    if(isTimeArrivalRelevant(timeArrival)){
+    if(isTimeArrivalRelevant(timeArrival)&&skills!=null){
       //check if disaster site demands  fits to agent skills.
       for(Skill s: demands){
         if(skills.getCapacity().contains(s)){
@@ -366,7 +400,6 @@ public void updateDemands(){
     }
     return false;
   }
-
 
   private double calcUtility(Vector<Skill> executions){
     double utility=0;
@@ -381,10 +414,7 @@ public void updateDemands(){
     return utility;
   }
 
-
-
-  public static HashMap<Agent, Double> sortByValue(HashMap<Agent, Double> hm)
-  {
+  public static HashMap<Agent, Double> sortByValue(HashMap<Agent, Double> hm) {
     // Create a list from elements of HashMap
     List<Map.Entry<Agent, Double> > list =
             new LinkedList<Map.Entry<Agent, Double> >(hm.entrySet());
@@ -406,9 +436,12 @@ public void updateDemands(){
     return temp;
   }
 
+public void addRelevantAgent(Agent agent){
+    this.relevantAgentsUtility.put(agent,-1.0);
+    this.relevantAgentsTimeArrival.put(agent,0.0);
+}
 
-
-
+//***********************************************************//
 
 
   public String toString(){
