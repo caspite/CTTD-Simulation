@@ -34,6 +34,7 @@ public class mainSimulation {
     public static final double Tmax = 8000;// the end time of the simulation
 
     int algorithmType=1; //0- greedy 1-SpcnDcop
+    int algorithmVersion;//algorithm Version for spcn
     Mailer mailer;
 
 
@@ -47,6 +48,8 @@ public class mainSimulation {
         this.diary = diary;
         this.hospitals = hos;
         this.allEventsForAllocation = activeEvents;
+
+        addFirstTaskToActiveEvents();
 
         createFirstAllocation();
         checkNewAllocation();
@@ -66,6 +69,7 @@ public class mainSimulation {
         this.mailer=mailer;
         createFirstAllocation();
         checkNewAllocation();
+        addFirstTaskToActiveEvents();
 
         diary.add(new EndShiftEvent(Tmax));
 
@@ -73,6 +77,15 @@ public class mainSimulation {
         //metrics = metrics2.createNewMetrics(1);
     }
 
+    private void addFirstTaskToActiveEvents(){
+        for(int i=0;i<allEventsForAllocation.size();i++){
+            Task t=allEventsForAllocation.get(i);
+            if(t.getMissionArrivalTime()==0){
+                activeEvents.add(t);
+            }
+
+        }
+    }
 
     /***
      * all medical units waiting and available
@@ -98,7 +111,7 @@ public class mainSimulation {
 
         do {
             currentDiaryEvent = diary.pollFirst(); // extract the next event
-            printCurrentEvent();
+//            printCurrentEvent();
 //            printCurrentAllocation();
             updateSimulation(currentDiaryEvent.getTime());
             if (currentDiaryEvent instanceof EndShiftEvent) {
@@ -132,6 +145,7 @@ public class mainSimulation {
      */
     private void handleNewEvent() {
         activeEvents.add(currentDiaryEvent.getEvent());
+        allAgentsAvailable();
         switch (algorithmType){
             case 0:
                 solveGreedyAlgorithm();
@@ -141,6 +155,15 @@ public class mainSimulation {
                 break;
 
         }
+    }
+
+    private void  allAgentsAvailable(){
+        for(MedicalUnit mu:medicalUnits){
+            if(!availableAgent.contains(mu)){
+                availableAgent.add(mu);
+            }
+        }
+
     }
 
     /***
@@ -170,10 +193,11 @@ public class mainSimulation {
     }
 
     public void solveSpcnDcop(){
-        SpcnDcop s=new SpcnDcop(this.availableAgent,this.activeEvents,this.mailer,this.Tnow);
+        SpcnDcop s=new SpcnDcop(this.availableAgent,this.activeEvents,this.mailer,this.Tnow,this.algorithmVersion);
         s.createConstraintGraph(Tnow);
         Vector<Assignment> newAllocation = s.solve();
         updateCurrentAllocation(newAllocation);
+        printCurrentAllocation();
     }
 
     private void updateCurrentAllocation(Vector<Assignment> allocation){
@@ -212,7 +236,7 @@ public class mainSimulation {
      */
     private void handleAgentArrivesEvent() {
         Assignment as = currentDiaryEvent.getAssignment();
-
+        as.setArrivalTime(Tnow);
         if (as.getTask() instanceof MissionEvent) {
             //if is the first agent - information task
             if (!as.getTask().isStarted()) {
@@ -226,20 +250,20 @@ public class mainSimulation {
                 //if agent not working
                 if(as.getAgent().getStatus()== WAITING){
                     addAvailableAgent(as.getAgent());
-                    switch (algorithmType){
-                        case 0:
-                            solveGreedyAlgorithm();
-                            break;
-                        case 1:
-                            solveSpcnDcop();
-                            break;
-                    }
+//                    switch (algorithmType){
+//                        case 0:
+//                            solveGreedyAlgorithm();
+//                            break;
+//                        case 1:
+//                            solveSpcnDcop();
+//                            break;
+//                    }
                 createLeavingEvent(as);
             }
         }
         // adds the arriving agent to set of working agents on the event
         as.getTask().addAgent(as, Tnow);
-        as.setArrivalTime(Tnow);
+
 
         // agent no longer on the way
         as.getAgent().setOnTheWay(false);
@@ -279,14 +303,15 @@ public class mainSimulation {
             //add agent to available agent and call the greedy algorithm
             mu.setStatus(WAITING);
             addAvailableAgent(mu);
-            switch (algorithmType){
-                case 0:
-                    solveGreedyAlgorithm();
-                    break;
-                case 1:
-                    solveSpcnDcop();
-                    break;
-            }        }
+//            switch (algorithmType){
+//                case 0:
+//                    solveGreedyAlgorithm();
+//                    break;
+//                case 1:
+//                    solveSpcnDcop();
+//                    break;
+//            }
+        }
         if(((DisasterSite)as.getTask()).finished()){
             removeTaskFromActiveEvent(as.getTask());
         }
@@ -356,14 +381,15 @@ public class mainSimulation {
         addAvailableAgent(mu);
         mu.setCurrentTask(currentDiaryEvent.getAssignment());
         //call greedy algorithm
-        switch (algorithmType){
-            case 0:
-                solveGreedyAlgorithm();
-                break;
-            case 1:
-                solveSpcnDcop();
-                break;
-        }    }
+//        switch (algorithmType){
+//            case 0:
+//                solveGreedyAlgorithm();
+//                break;
+//            case 1:
+//                solveSpcnDcop();
+//                break;
+//        }
+    }
 
 
 
@@ -375,6 +401,7 @@ public class mainSimulation {
     private void updateSimulation(double tnow){
         Tnow = tnow; // set simulation  Time - hours
         Told = Tnow;
+        oldAllocation = currentAllocation;
 
         //update agent's capacity+ utilities for the current task - to add for each agent the estimate utility
         for(Agent a: medicalUnits){
@@ -384,18 +411,28 @@ public class mainSimulation {
 
 
 
+
     }
     /***
      *     prints current allocation of the units to the missions
      */
     private void printCurrentAllocation() {
+        for(Task task:activeEvents){
+            System.out.println("");
+            System.out.println("Task: "+task.getId() + " , "+((DisasterSite)task).getRemainCoverByCurrentAllocation());
 
-        System.out.println("");
+        }
 
 
         for (MedicalUnit m : medicalUnits) {
-            System.out.print("" +  m.toString() + " - Disaster Site ID "
-                    + m.getCurrentTaskID());
+            System.out.print("Agent" +  m.getId() + " assignments: ");
+            for(int i=0;i<m.getCurrentAssignment().length;i++){
+                if(m.getCurrentAssignment()[i] == null){
+                    System.out.println("");
+                }
+                else
+                    System.out.println(m.getCurrentAssignment()[i].toString());
+            }
         }
 
         System.out.println("");

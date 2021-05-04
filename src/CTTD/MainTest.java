@@ -12,9 +12,9 @@ public class MainTest {
     public static void main(String[] args) throws Exception {
 
         //generate a new problem params
-        double newDS=0.009;
+        double newDS=0.09;
         double newCas=0.8;
-        int MaxCasForSite=100;
+        int MaxCasForSite=10;
         TreeMap<Double,Triage> triageProbability=new TreeMap<>();
         TreeMap<Double,AgentType> agentTypeProbability=new TreeMap<>();
         TreeMap<Double,Integer> priority=new TreeMap<>();

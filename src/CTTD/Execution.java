@@ -13,6 +13,7 @@ public class Execution extends Skill {
         super(triage,activity);
         this.cas=cas;
         this.lastUpdate=0;
+        updateDuration();
         calcEstimateUtility();
     }
 
@@ -21,21 +22,50 @@ public class Execution extends Skill {
         this.cas=cas;
         this.lastUpdate=0;
         this.startTime=startTime;
+        updateDuration();
         calcEstimateUtility();
+
+    }
+    public Execution(Triage triage, Activity activity,Casualty cas,double startTime,double utility){
+        super(triage,activity);
+        this.cas=cas;
+        this.lastUpdate=0;
+        this.startTime=startTime;
+        this.utility=utility;
+        updateDuration();
+
     }
 
 //*** methods ***//
     private void calcEstimateUtility(){
     //take the current survival
-        double currentSurvival= cas.getSurvival();
     //take the estimate survival at the end time of the execution
-        double endSurvival =cas.getSurvivalByTime(this.startTime+this.getDuration());
-    this.utility=currentSurvival-endSurvival-this.penalty;
+        double startActivitySurvival =cas.calcSurvivalByTime(this.startTime);
+    this.utility= startActivitySurvival;
+    }
+
+    private void updateDuration(){
+        RPM rmp=cas.getCurrentRPM();
+        double casualtyTBorn=cas.getTBorn();
+        RPM rpmToDuration = rmp.returnRpmByTime(this.startTime-casualtyTBorn);
+        if (this.getActivity() == Activity.UPLOADING){
+            this.duration=rpmToDuration.getUploadingTime();
+        }
+        else if (this.getActivity()==Activity.TREATMENT){
+            duration= rpmToDuration.getCareTime();
+        }
+        else if (this.getActivity() == Activity.TRANSPORT){
+           duration= calcTransferTime();
+        }
+    }
+
+    private double calcTransferTime(){
+       return getCas().getDisasterSite().getEvacuationTime();
     }
 
 
-    public void updatePenalty(){
-        this.penalty=this.utility;
+    public void updatePenalty(double factor){
+        this.penalty=this.utility*factor;
     }
 
     //***getters & setters***//
@@ -64,5 +94,12 @@ public class Execution extends Skill {
     public double getUtility() {
         return utility;
     }
+
+    public double getStartTime() {
+        return startTime;
+    }
+
+
+
     //-------------------------------------------------------------------------------------//
 }

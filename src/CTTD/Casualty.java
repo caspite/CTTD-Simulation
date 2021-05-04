@@ -1,13 +1,11 @@
 package CTTD;
 
-import TaskAllocation.Task;
-
 import java.lang.reflect.Array;
 import java.util.*;
 
 public class Casualty {
 public Triage triage;
-public double survival;//the current survival
+private double survival;//the current survival
 public double timeToSurvive;
 public Status status;
 private Activity activity[]={Activity.TRANSPORT,Activity.UPLOADING,Activity.TREATMENT};//the list of the casualty's activities to allocate
@@ -15,16 +13,20 @@ public int priority;
 private double StandbyTime;
 private double TBorn;//time that the casualty born
 public int id;
-public int DS_Id;
+public int DS_Id;//the DS
 private double initSurvival; // the init survival of the cas
 private double finiteSurvival;
+private double  intervalSurvival;//if cas finished - this is the remain survival according to time loss
 private DisasterSite disasterSite;
+private RPM initRPM;//the initial RPM according to triage
+private RPM currentRPM;//the current cas RPM
+private RPM finiteRPM;//the final cas RPM
 
 
     public enum Status{
         WATING,RECEIVEDTREATMENT,LOADED,FINISHED
     }
-    //-------------------------constructors---------------------------------------------//
+    // *** constructors *** //
     public Casualty(){}
     public Casualty(Triage triage,Status status,double survival,int id,int DS_ID,double TBorn,DisasterSite disasterSite)
     {
@@ -36,28 +38,40 @@ private DisasterSite disasterSite;
         this.TBorn=TBorn;
         this.initSurvival=survival;
         this.disasterSite=disasterSite;
+        calcInitRPM();
+        calcSurvivalByRPM();
+        setInitSurvaival(this.initRPM.getSurvival());
         setTimeToSurvive();
         setPriority();
     }
+//************************************************************************//
 
-    //calculate survival-------------------------------------//
-    //TODO - different init survival
-    public void setSurvival(double Tnow) {
-       this.survival=Probabilities.getSurvival(triage,TBorn, Tnow, status);
+    //*** survival cal *** //
+    public void calcSurvivalByRPM(){
+        this.survival=this.currentRPM.getSurvival();
+    }
+    private void calcInitRPM(){
+        Triage triage=this.triage;
+       this.initRPM=new RPM(triage);
+        this.currentRPM = new RPM(initRPM.getSurvival(),initRPM.getTriage(),initRPM.getCareTime(),initRPM.getTimeToSurvive(),initRPM.getRpm());
     }
 
-public void setTimeToSurvive(){
 
-        this.timeToSurvive= Probabilities.getTimeToSurvive(this.triage,this.TBorn);
+    public void setTimeToSurvive(){
+
+   this.timeToSurvive= (currentRPM.getTimeToSurvive()+this.TBorn);
 }
 
-public double getSurvivalByTime(double time){
-        double survival=this.survival;
-        Probabilities.getSurvival(this.triage,this.TBorn,time);
-
-    return survival;
-
+private void setInitSurvaival(double survival){
+        this.initSurvival=survival;
 }
+
+    public double calcSurvivalByTime(double time){
+            double timeInterval=time-TBorn;
+
+           return this.currentRPM.calcSurvivalByTimeInterval(timeInterval);
+
+    }
 
     public void setPriority() {
         switch (triage) {
@@ -81,24 +95,38 @@ public double getSurvivalByTime(double time){
 
     public Activity[] getActivity() {return activity;}
 
+    public double getInitSurvival() {
+        return initSurvival;
+    }
 
+    public double getFiniteSurvival() {
+        return finiteSurvival;
+    }
+
+    public RPM getCurrentRPM() {
+        return currentRPM;
+    }
+
+    public DisasterSite getDisasterSite() {
+        return disasterSite;
+    }
 
     //hashmap with activities duration
-    public HashMap<Activity,Double> getActivityDuration(){
-        HashMap<Activity,Double> ActDuration=new HashMap<Activity,Double>();
-        ActDuration.put(Activity.TRANSPORT,Probabilities.getActivity(triage,survival,Activity.TRANSPORT));//
+    public HashMap<Activity,Double> getActivitiesDuration(){
+        HashMap<Activity,Double> actDuration =new HashMap<Activity,Double>();
+        actDuration.put(Activity.TRANSPORT,disasterSite.getEvacuationTime());//
 
         switch (status){
             case WATING:
-                ActDuration.put(Activity.TREATMENT,Probabilities.getActivity(triage,survival,Activity.TREATMENT));
-                ActDuration.put(Activity.UPLOADING,Probabilities.getActivity(triage,survival,Activity.UPLOADING));
+                actDuration.put(Activity.TREATMENT,currentRPM.getCareTime());
+                actDuration.put(Activity.UPLOADING,currentRPM.getUploadingTime());
             case RECEIVEDTREATMENT:
-                ActDuration.put(Activity.UPLOADING,Probabilities.getActivity(triage,survival,Activity.UPLOADING));
+                actDuration.put(Activity.UPLOADING,currentRPM.getUploadingTime());
             case LOADED:
             case FINISHED:
                 return null;
         }
-        return ActDuration;
+        return actDuration;
     }
     public boolean isAgentRequired(MedicalUnit medicalUnit,double timeArrival){
         //check if casualty will survive at time arrival
@@ -112,7 +140,7 @@ public double getSurvivalByTime(double time){
     }
     private boolean compareAgentCasualtyActivities(MedicalUnit mu){
         //check if agent skill fit to casualty
-        Vector <Skill> skills =mu.getAgentSkills().getCapacity();
+        Vector <Skill> skills =mu.getAgentSkills().getSkills();
         for(int i=0;i<getActivity().length;i++){
            Skill s=new Skill(triage, (Activity)Array.get(getActivity(),i));
            if(skills.contains(s))
@@ -191,8 +219,20 @@ public double getSurvivalByTime(double time){
 
     }
 
-    public void setFiniteSurvival(double Tnow){
-        this.finiteSurvival=Probabilities.getSurvival(triage,TBorn, Tnow, status);
+    public void setFiniteSurvival(double tNow){
+        updateCurrentRpm(tNow);
+        this.finiteSurvival=this.calcSurvivalByTime(tNow);
+        SetFiniteRpm(this.currentRPM);
+
+//        this.finiteSurvival=Probabilities.getSurvival(triage,TBorn, Tnow, status);
+//        intervalSurvival=initSurvival-finiteSurvival;
+    }
+    public void updateCurrentRpm(double tnow){
+        currentRPM.updateRpmByTime(tnow);
+    }
+
+    private void SetFiniteRpm(RPM rpm){
+        finiteRPM=rpm;
     }
 
     public boolean isServiceRequired(Capacity capacity,double timeArrival){
@@ -207,7 +247,7 @@ public double getSurvivalByTime(double time){
     }
     private boolean compareServiceCasualtyActivities(Capacity capacity){
         //check if agent skill fit to casualty
-        Vector <Skill> skills =capacity.getCapacity();
+        Vector <Skill> skills =capacity.getSkills();
         for(int i=0;i<getActivity().length;i++){
             Skill s=new Skill(triage, (Activity)Array.get(getActivity(),i));
             if(skills.contains(s))
@@ -251,13 +291,17 @@ public double getSurvivalByTime(double time){
 //        return triageActivity;
 //
 //    }
+
+
     public String toString(){
-        return "\nCasualty: "+this.id+" init survival : "+this.initSurvival+" current survival: "+this.survival;
+        return ""+this.triage+" survival"+this.getSurvival();
+
+//        return "\nCasualty: "+this.id+" init survival : "+this.initSurvival+" current survival: "+this.survival;
     }
 
 
 
-
+//TODO update current RPM accurding to start time reacive treatment
 
 
 

@@ -2,7 +2,7 @@ package CttdSolver;
 
 import CTTD.DisasterSite;
 import CTTD.MedicalUnit;
-import Helpers.WriteToFile;
+import StaticCTTD.StaticAllocation;
 import TaskAllocation.Agent;
 import TaskAllocation.Assignment;
 import DCOP.*;
@@ -14,20 +14,22 @@ public class SpcnDcop extends Solver{
 
     Vector<Agent> medicalUnits;
     Vector<Task> disasterSites;
-    int iteration=1000;//num of max iteration
+    int iteration=50;//num of max iteration
     Mailer mailer;
     Output output;
     double tnow;
+    int algorithmVersion;
 
     //*** constructor ***//
 
-    public SpcnDcop (Vector<Agent> medicalUnits,Vector<Task> disasterSites,Mailer mailer,double tnow){
+    public SpcnDcop (Vector<Agent> medicalUnits,Vector<Task> disasterSites,Mailer mailer,double tnow,int algorithmVersion){
         super();
         this.disasterSites=disasterSites;
         this.medicalUnits=medicalUnits;
         this.mailer=mailer;
-        output=new Output();
+        output=new Output(1);
         this.tnow=tnow;
+        this.algorithmVersion=algorithmVersion;
     }
     //*** Create Constrain Graph Methods ***//
 
@@ -37,16 +39,18 @@ public class SpcnDcop extends Solver{
         for(Agent medicalUnit:medicalUnits){
             initializeVariables(medicalUnit);
             for( Task disasterSite: disasterSites){
+                ((SpcnDisasterSite)disasterSite).setVersion(algorithmVersion);
                 //check if the agent relevant to task and update available task for each agent and each task
 
                 if(isAgentRelevant(medicalUnit,disasterSite,tnow)){
-                    ((MedicalUnit) medicalUnit).addRelevantDisasterSite(disasterSite);
-                    ((DisasterSite)disasterSite).addRelevantAgent(medicalUnit);
+                    ((SpncMedicalUnit) medicalUnit).addRelevantDisasterSite(disasterSite,tnow);
+                    ((SpcnDisasterSite)disasterSite).addRelevantAgent(medicalUnit);
+                    ((SpncMedicalUnit) medicalUnit).setNextTimeToAllocation(tnow);
                 }
-                //TODO initailze vectors in disaster site and medical units- hashmaps - utility to -1 and arrival time to 0/
 
             }
         }
+        //TODO - add remove not connected agents
     }
 
 
@@ -58,19 +62,24 @@ public class SpcnDcop extends Solver{
     }
 
     private void initializeVariables(Agent agent){
-        ((MedicalUnit)agent).setNextTimeToAllocation(((MedicalUnit)agent).getLastTimeUpdate());
-        ((MedicalUnit)agent).setAvailableSkillsForAllocation(((MedicalUnit)agent).getAgentSkills().getCapacity());
+        ((SpncMedicalUnit)agent).setNextTimeToAllocation(((MedicalUnit)agent).getLastTimeUpdate());
+        ((SpncMedicalUnit)agent).setAvailableSkillsForAllocation(((MedicalUnit)agent).getAgentSkills().getSkills());
         Assignment[] currentAssignment =new Assignment[((MedicalUnit)agent).getNumOfAllocateTask()];
-        ((MedicalUnit)agent).setCurrentAssignment(currentAssignment);
+        ((SpncMedicalUnit)agent).setCurrentAssignment(currentAssignment);
+        ((SpncMedicalUnit)agent).setVersion(algorithmVersion);
     }
 
     protected void runSyncSPCN(){
         createFirstMessages();
-        for(int currentIteration=0;currentIteration<=iteration;currentIteration++){
-            agentsSentMessages();
+        for(int currentIteration=1;currentIteration<=iteration;currentIteration++){
             taskSentMessages();
+
+            mailerPutMessagesInMailBox();
+            agentsSentMessages();
             mailerPutMessagesInMailBox();
             updateOutput(currentIteration);
+            StaticAllocation.printCurrentAllocation(this.medicalUnits,this.disasterSites);
+
         }
     }
 
@@ -82,6 +91,7 @@ public class SpcnDcop extends Solver{
             ((DisasterSite)task).createFirstMessages();
         }
         mailerPutMessagesInMailBox();
+        updateOutput(0);
 
     }
 
@@ -105,7 +115,7 @@ public class SpcnDcop extends Solver{
     protected void updateOutput(int currentIteration){
         double globalCost=calcGlobalCost();
         output.addGlobalCost(currentIteration,globalCost);
-
+//        System.out.println("globalCost "+globalCost+" ,it "+currentIteration );
     }
 
     private double calcGlobalCost(){
@@ -117,10 +127,12 @@ public class SpcnDcop extends Solver{
     }
 
 
+    //*** getters & setters ***//
 
 
-
-
+    public Output getOutput() {
+        return output;
+    }
 
     @Override
     public Vector<Assignment> solve() {
@@ -128,12 +140,15 @@ public class SpcnDcop extends Solver{
         runSyncSPCN();
         for(Agent agent:medicalUnits){
             for(int i=0;i<((MedicalUnit)agent).getCurrentAssignment().length;i++){
-                if(((MedicalUnit)agent).getCurrentAssignment()[i]!=null){
-                    finalAssignment.add(((MedicalUnit)agent).getCurrentAssignment()[i]);
+                Assignment as=((MedicalUnit)agent).getCurrentAssignment()[i];
+                if(as!=null){
+                    finalAssignment.add(as);
+                    as.calcUtility();
+                    as.setPenalty(as.getUtility());
                 }
             }
         }
-        output.writeToFile(tnow);
+        output.writeToFile(medicalUnits.size(),disasterSites.size(),tnow,algorithmVersion);
 
         return finalAssignment;
     }

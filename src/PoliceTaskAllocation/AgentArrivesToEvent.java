@@ -10,9 +10,8 @@ public class AgentArrivesToEvent extends DiaryEvent {
 	 
 	public AgentArrivesToEvent( Assignment as, double tnow) {
 		super(as);
-		double dis = Distance.travelTime(as.getAgent(),as.getTask());
-		time=dis+tnow;
-		as.getAgent().setMovingTime(dis);
+		time=as.getArrivalTime();
+		as.getAgent().setMovingTime(time);//todo-remove this function
 		as.getAgent().setStartMovingTime(tnow);
 		as.getAgent().setOnTheWay(true);
 		as.getAgent().setStatus(MOVING);

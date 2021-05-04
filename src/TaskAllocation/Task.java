@@ -68,6 +68,8 @@ public class Task implements Distancable, Serializable, Comparable<Task>, Messag
 
 	}
 
+	public Task(){}
+
 	public Task(Location location,int id) {
 		super();
 		this.location = location;

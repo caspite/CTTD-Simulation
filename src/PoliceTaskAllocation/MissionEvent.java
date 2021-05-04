@@ -9,6 +9,9 @@ public class MissionEvent extends Task{
 	
 //------------------------------------------------constructor------------------------------------------//
 
+	public MissionEvent(){
+		super();
+	};
 	public MissionEvent(Location location, double duration, double startTime,
 			int id, int priority,double utility,HashMap<AgentType, Integer> agentsRequired) {
 		super(location, duration, startTime, id, priority,utility,agentsRequired);

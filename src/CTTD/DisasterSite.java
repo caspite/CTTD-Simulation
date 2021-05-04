@@ -1,6 +1,5 @@
 package CTTD;
 
-import CttdSolver.FirstMessage;
 import CttdSolver.ServiceMessage;
 import CttdSolver.UtilityMessage;
 import DCOP.*;
@@ -9,7 +8,6 @@ import PoliceTaskAllocation.MissionEvent;
 import TaskAllocation.Agent;
 import TaskAllocation.Assignment;
 import TaskAllocation.Location;
-import TaskAllocation.Messageable;
 
 import java.lang.reflect.Array;
 import java.util.*;
@@ -17,29 +15,36 @@ import java.util.*;
 
 public class DisasterSite extends MissionEvent  {
 
-  private boolean isInformed;//complete info activity
+  protected boolean isInformed;//complete info activity
   protected ArrayList<Casualty> casualties= new ArrayList();  //casualties list
-  private double remainCover;//the current score of the disaster site according to casualties
-  private double remainCoverByCurrentAllocation;
-  private double initScore;// the init disaster site score
-  private Vector <Skill> demands;//the disaster site demands to casualties
-  private TreeMap<Double, Skill> activitiesSchedule;
-  private boolean finished;
+  protected ArrayList<Casualty> finishedCasualties= new ArrayList();  //casualties list
+
+  protected double remainCover;//the current score of the disaster site according to casualties
+  protected double remainCoverByCurrentAllocation;
+  protected double initScore;// the init disaster site score
+  protected Vector <Skill> demands;//the disaster site demands to casualties
+  protected TreeMap<Double, Skill> activitiesSchedule;
+  protected boolean finished;
+  protected double evacuationTime;//Estimated average travel time to a nearby hospital
 
   //*** Message Variables ***//
-  MessageBox messageBox;// income last message from each agent
-  Vector<Message> messageToBeSent;
+  protected MessageBox messageBox;// income last message from each agent
+  protected Vector<Message> messageToBeSent;
 
   //*** allocation variables ***//
-  HashMap<Integer,Vector<Execution>> currentAllocation;//agents id,  execution - after confirm message
-  HashMap<Agent,Double> relevantAgentsTimeArrival;//relevant agents and time arrival according to confirm massage -1 for non allocation
-  HashMap<Agent,Double> relevantAgentsUtility;
+  protected HashMap<Integer,Vector<Execution>> currentAllocation;//agents id,  execution - after confirm message
+  protected HashMap<Agent,Double> relevantAgentsTimeArrival;//relevant agents and time arrival according to confirm massage -1 for non allocation
+  protected HashMap<Agent,Vector<Skill>> relevantAgentsUtility;
+  protected HashMap<Casualty,Activity[]> allocatedCasualties=new HashMap<>();
 
 
 
-//----------------------------------methods---------------------------------------------------//
+// *** methods *** //
 
   //***constructors***//
+  public DisasterSite(){
+    super();
+  }
   public DisasterSite(double duration, int id,double startTime, int priority){
     super(duration,  id,  priority);
     this.missionArrivalTime=startTime;
@@ -49,6 +54,7 @@ public class DisasterSite extends MissionEvent  {
     super(location,id,startTime);
     this.missionArrivalTime=startTime;
     this.finished=false;
+    this.priority=priority;
     relevantAgentsUtility=new HashMap<>();
     relevantAgentsTimeArrival=new HashMap<>();
     messageToBeSent=new Vector<>();
@@ -73,7 +79,12 @@ public class DisasterSite extends MissionEvent  {
 
 
   }
-  //-------------------------------getters and setters---------------------------//
+  // *** getters and setters *** //
+
+
+  public ArrayList<Casualty> getCasualties() {
+    return casualties;
+  }
 
   public void setStarted(boolean isStarted) {
     this.isStarted = isStarted;
@@ -84,11 +95,19 @@ public class DisasterSite extends MissionEvent  {
   public void setInitCasualties(List<Casualty> casualties)
   {
     this.casualties.addAll(casualties);
-    setRemainCover();
+    updateRemainCover();
     this.initScore=this.remainCover;
     initDemands();
     hardConstraintTime();
 //    this.setTriageActivityHashMap();
+  }
+
+  public void setEvacuationTime(double evacuationTime){
+    this.evacuationTime=evacuationTime;
+  }
+
+  public double getEvacuationTime() {
+    return evacuationTime;
   }
 
   private void initDemands(){
@@ -116,10 +135,13 @@ public class DisasterSite extends MissionEvent  {
   }
 
   //remain cover according to casualties
-  public void setRemainCover(){
+  public void updateRemainCover(){
     this.remainCover=0;
     for(Casualty cas:this.casualties){
-      this.remainCover+=cas.survival;
+      this.remainCover+=cas.getSurvival();
+    }
+    for(Casualty cas:this.finishedCasualties){
+      this.remainCover += cas.getFiniteSurvival();
     }
   }
 
@@ -134,16 +156,16 @@ public class DisasterSite extends MissionEvent  {
         return Integer.valueOf(o1.priority).compareTo(o2.priority);
       }
     });
-    System.out.println(casualties);
+   // System.out.println(casualties);
   }
   /*sort by survival*/
-  private void sortCasualtiesBySurvival(){
+  protected void sortCasualtiesBySurvival(){
 
     Collections.sort(casualties, new Comparator<Casualty>() {
       @Override
       public int compare(Casualty o1, Casualty o2) {
 
-        return Double.valueOf(o1.survival).compareTo(o2.survival);
+        return Double.valueOf(o1.getSurvival()).compareTo(o2.getSurvival());
       }
     });
   }
@@ -173,10 +195,11 @@ public class DisasterSite extends MissionEvent  {
       for(Casualty c:casualties){
         if(c.equals(cas)){
           casualties.remove(c);
+          finishedCasualties.add(cas);
         }
       }
       //update remain cover according to the casualties on the site
-      setRemainCover();
+      updateRemainCover();
     }
     else{
       System.out.println("casualty not finished");
@@ -189,7 +212,7 @@ public class DisasterSite extends MissionEvent  {
     if(isTimeArrivalRelevant(AgentTimeToTravel(mu)+Tnow)){
       //check if disaster site demands  fits to agent skills.
       for(Skill s: demands){
-        if(mu.skills.getCapacity().contains(s)){
+        if(mu.skills.getSkills().contains(s)){
           return true;
         }
       }
@@ -199,8 +222,6 @@ public class DisasterSite extends MissionEvent  {
 
 
 public void reduceDemands(Skill skill){
-    //update disaster site demands according to casualties on site
-  this.updateDemands();
     if(demands.contains(skill))
       this.demands.remove(skill);
     else
@@ -209,6 +230,7 @@ public void reduceDemands(Skill skill){
 
 public void updateDemands(){
     this.demands.clear();
+    this.allocatedCasualties.clear();
   for(Casualty cas:casualties) {
     Triage trg = cas.getTriage();
     Activity[] act = cas.getActivity();
@@ -216,14 +238,16 @@ public void updateDemands(){
       Activity a = (Activity) Array.get(act, i);
       demands.add(new Skill(trg, a));
     }
+    updateRemainCover();
+    remainCoverByCurrentAllocation=remainCover;
   }
-  remainCoverByCurrentAllocation=remainCover;
+
 }
   private double AgentTimeToTravel(MedicalUnit medicalUnit){
 
    return Distance.travelTime(medicalUnit,this);
   }
-  private boolean isTimeArrivalRelevant(double time){
+  protected boolean isTimeArrivalRelevant(double time){
     if(this.getHardConstraintTime()>time){
       return true;
     }
@@ -254,8 +278,8 @@ public void updateDemands(){
 
   private TreeMap<Double,Skill>  allocateSkillsToCasualties(Capacity capacity,double time){
     TreeMap<Double,Skill> activitiesAssignment=new TreeMap<>();//the return
-    double capacityScore = capacity.getCurrentScore();//the agent capacity//TODO potential bug!! check if update capacity --> agent skills
-
+    double capacityScore = capacity.getCurrentScore();//the agent capacity
+//    this.updateDemands();
       //start with the urgent casualty
       this.sortCasualtiesBySurvival();
       for(int i=0; i< casualties.size();i++){
@@ -272,7 +296,7 @@ public void updateDemands(){
                 Activity act = activity[activity.length-(1+j)];
                 //check if the agent skill contains the demand and add to the HashMap
                 Skill s = new Execution(cas.getTriage(), act,cas,time);
-                if (isContains(s,capacity.getCapacity())&&this.demands.contains(s)) {
+                if (isContains(s,capacity.getSkills())&&this.demands.contains(s)) {
                   activitiesAssignment.put(time,s);
                   //reduce agent capacity
                   capacityScore-=s.getScore();
@@ -289,7 +313,7 @@ public void updateDemands(){
 
     return activitiesAssignment;
   }
-  private boolean isContains(Skill s,Vector<Skill> skills){
+  protected boolean isContains(Skill s,Vector<Skill> skills){
     for(Skill skill:skills){
       if(s.equals(skill))
         return true;
@@ -299,7 +323,7 @@ public void updateDemands(){
 
   public void reduceCasualties(Casualty cas){
     casualties.remove(cas);
-    setRemainCover();
+    updateRemainCover();
     if (casualties.size()<=0){
       finished=true;
       System.out.println("disaster site: "+this.id+" finished. finale score: "+remainCover+" ---------------------------------------------------------------------");
@@ -318,39 +342,201 @@ public MessageBox getAgentMessageBox() {
 
 
   public void createFirstMessages(){
-    for(Agent agent: relevantAgentsTimeArrival.keySet()){
-      Message newMessage = new UtilityMessage(this.id,agent.getId(),-1,null);
-      messageToBeSent.add(newMessage);
-    }
-    putMessageInMailer();
-
-
-  }
-  public void createNewMessageSPCN(){
     messageToBeSent.clear();
     updateDemands();//update the demands according to casualties on site
 
+    for(Agent agent: relevantAgentsTimeArrival.keySet()){
+      Message newMessage = new UtilityMessage(this.id,agent.getId(),-1);
+      messageToBeSent.add(newMessage);
+    }
+    putMessageInMailer();
+//    System.out.println("remain cover: "+remainCoverByCurrentAllocation);
+
+  }
+  public void createNewMessageSPCN(){
+    relevantAgentsUtilityClearUtility();
+    allocatedCasualties.clear();
+    messageToBeSent.clear();
+    updateDemands();//update the demands according to casualties on site
+//    System.out.println("remain cover: "+remainCoverByCurrentAllocation);
     updateAgentsTimeArrivalMap();
     //sort all the relevant agents by the time arrival
     HashMap<Agent,Double> sortedAgentsByTimeArrival =sortByValue(relevantAgentsTimeArrival);
 
-    for(Agent agent: sortedAgentsByTimeArrival.keySet()){
-    Message message = messageBox.getMessages().get(agent.getId());
-     double utility= createUtilityMessage(message);//execution is null if agent not relevant
-      updateAgentsUtility(agent,utility);
-      updateRemainCoverByCurrentAllocation(utility);
+//    for(Agent agent: sortedAgentsByTimeArrival.keySet()){
+//    Message message = messageBox.getMessages().get(agent.getId());
+//     double utility= createUtilityMessage(message);//execution is null if agent not relevant
+//      updateAgentsUtility(agent,utility);
+////      updateRemainCoverByCurrentAllocation(utility);
+////      System.out.println("agent: "+agent.getId()+ "utility"+ utility);
+//
+//    }
+   while(!finishedAllocation()){
+     sortedAgentsByTimeArrival =sortByValue(relevantAgentsTimeArrival);
+     for(Agent agent: sortedAgentsByTimeArrival.keySet()){
+       Message message = messageBox.getMessages().get(agent.getId());
+       Capacity availableCapacity = calcAvailableCapacity(agent,((ServiceMessage)message).getCapacity());
+       double arrivalTime=sortedAgentsByTimeArrival.get(agent);
+       Casualty casualty = getNextCasualty(agent,arrivalTime);
+       if(casualty==null){
+         relevantAgentsTimeArrival.replace(agent,-1.0);
+         continue;
+       }
+       Vector<Skill> allocation = allocateActivitiesToCasualty(casualty,availableCapacity,arrivalTime);
+
+       if(allocation.size()<=0){
+            relevantAgentsTimeArrival.replace(agent,-1.0);
+             continue;
+           }
+
+       updateAgent(allocation,agent);
+       break;
+     }
     }
+   createUtilityMessages();
+
 
     putMessageInMailer();
 
   }
 
-  private void updateRemainCoverByCurrentAllocation(double utility){
-    remainCoverByCurrentAllocation-=utility;
+  private Vector<Skill>allocateNextCas(Casualty casualty,Capacity availableCapacity,double arrivalTime){
+    Vector<Skill> allocation=new Vector<>();
+    this.sortCasualtiesBySurvival();
+    for(int i=0; i< casualties.size();i++) {
+      Casualty cas = casualties.get(i);
+      if (CasualtyAllocated(cas)|| cas.equals(casualty)){
+        continue;
+      } else{
+        allocation = allocateActivitiesToCasualty(cas,availableCapacity,arrivalTime);
+        if(allocation.size()<=0){
+          continue;
+        }
+        else return allocation;
+      }
+    }
+    return allocation;
   }
 
-  private void updateAgentsUtility(Agent agent,double utility){
-    this.relevantAgentsUtility.replace(agent,utility);
+  private void relevantAgentsUtilityClearUtility(){
+    for(Agent a:relevantAgentsUtility.keySet()){
+      relevantAgentsUtility.get(a).removeAllElements();
+    }
+  }
+
+  private void createUtilityMessages(){
+    for(Agent agent:relevantAgentsUtility.keySet()){
+      Vector <Skill> executions = relevantAgentsUtility.get(agent);
+      Vector<Skill> s=new Vector<>();
+      for(Skill sk:executions){
+        Execution ex=new Execution(sk.getTriage(),sk.getActivity(),((Execution)sk).getCas(),((Execution)sk).getStartTime(),((Execution)sk).getUtility());
+        s.add(ex);
+      }
+      double utility =calcUtility(executions);
+      Message newMessage = new UtilityMessage(this.id,agent.getId(),utility,s);
+      messageToBeSent.add(newMessage);
+      System.out.println("utility message: task: "+this.id+" utility: "+utility+ "for agent: "+agent.getId());
+    }
+  }
+  private void updateAgent(Vector<Skill> allocation,Agent agent){
+    double duration=0;
+    for(int i=0;i<allocation.size();i++){
+      duration+=allocation.get(i).getDuration();
+    }
+    duration+=relevantAgentsTimeArrival.get(agent);
+    relevantAgentsTimeArrival.replace(agent,duration);
+    updateAgentsUtility(agent,allocation);
+
+  }
+
+  private  boolean finishedAllocation(){
+    for(double a:relevantAgentsTimeArrival.values()){
+      if (a>=0)
+        return false;
+    }
+    return true;
+
+  }
+
+  private Capacity calcAvailableCapacity(Agent agent,Capacity capacity){
+   Vector<Skill> skill = relevantAgentsUtility.get(agent);
+   capacity.getSkills().removeAll(skill);
+    return capacity;
+  }
+
+  private Casualty getNextCasualty(Agent agent,double time){
+    //start with the urgent casualty
+    this.sortCasualtiesBySurvival();
+    for(int i=0; i< casualties.size();i++) {
+      Casualty cas = casualties.get(i);
+      if (CasualtyAllocated(cas)||!cas.isAgentRequired((MedicalUnit) agent,time)) {
+        continue;
+      } else
+        return cas;
+    }
+    return null;
+  }
+
+  private boolean CasualtyAllocated(Casualty cas){
+   if(allocatedCasualties.containsKey(cas)){
+     //TODO- add activities allocation
+     return true;
+   }
+   return false;
+  }
+
+  private Vector<Skill> allocateActivitiesToCasualty(Casualty cas,Capacity capacity,double arrivalTime) {
+    Vector<Skill> activitiesAssignment = new Vector<>();
+    double capacityScore = capacity.getCurrentScore();
+    double time = arrivalTime;
+    int j = 0;
+    Activity[] activity = cas.getActivity();
+    //if agent have free capacity
+    if (capacityScore > 0) {
+      if (cas.status != Casualty.Status.FINISHED) {
+        //while tha cas has open activities
+        while (j < activity.length && capacityScore > 0) {
+          //get cas next activity
+          Activity act = activity[activity.length - (1 + j)];
+          //check if the agent skill contains the demand and add to the vector
+          Skill s = new Execution(cas.getTriage(), act, cas, time);
+          if (isContains(s, capacity.getSkills()) && this.demands.contains(s)) {
+            activitiesAssignment.add(s);
+            //reduce agent capacity
+            capacityScore -= s.getScore();
+            //set time
+            time += s.getDuration();
+            //update site demands
+            this.reduceDemands(s);
+          }
+          if(j>0){
+            ((Execution)s).setUtility(0);
+          }
+          j++;
+        }
+      }
+    }
+    allocatedCasualties.put(cas,null);
+    return activitiesAssignment;
+  }
+
+  public void updateRemainCoverByCurrentAllocation(double utility){
+    remainCoverByCurrentAllocation-=(utility);
+  }
+
+  private void updateAgentsUtility(Agent agent,Vector<Skill> skills){
+    Vector<Skill> s=new Vector<>();
+    for(Skill sk:skills){
+      Execution ex=new Execution(sk.getTriage(),sk.getActivity(),((Execution)sk).getCas(),((Execution)sk).getStartTime(),((Execution)sk).getUtility());
+      s.add(ex);
+    }
+    if(this.relevantAgentsUtility.get(agent)==null){
+   this.relevantAgentsUtility.replace(agent,s);
+    }
+    else{
+      this.relevantAgentsUtility.get(agent).addAll(s);
+    }
+
   }
 
   private void updateAgentsTimeArrivalMap(){
@@ -377,23 +563,65 @@ public MessageBox getAgentMessageBox() {
   }
 
   private Vector<Skill> calcExecution(Capacity capacity,double timeArrival){
-    Vector<Skill> executions =new Vector<>();
+    Vector<Skill> executions;
     //check if the agent relevant
     if(isServiceRequired(capacity,timeArrival)&&timeArrival>-1){
       executions = new Vector<>();
-      executions.addAll(allocateSkillsToCasualties(capacity,timeArrival).values());
+      executions.addAll(allocateSkillsToCasualty(capacity,timeArrival));
     }
     else
       return null;
     return executions;
   }
 
+  private Vector<Skill> allocateSkillsToCasualty(Capacity capacity,double time){
+    Vector<Skill> activitiesAssignment=new Vector<>();//the return
+    double capacityScore = capacity.getCurrentScore();//the agent capacity
+    //start with the urgent casualty
+    this.sortCasualtiesBySurvival();
+    for(int i=0; i< casualties.size();i++) {
+      Casualty cas = casualties.get(i);
+
+      if(allocatedCasualties.keySet().contains(cas)){
+        continue;
+      }
+      int j = 0;
+      Activity[] activity = cas.getActivity();
+      //if agent have free capacity
+      if (capacityScore > 0) {
+        if (cas.status != Casualty.Status.FINISHED) {
+          //while tha cas has open activities
+          while (j < activity.length && capacityScore > 0) {
+            //get cas next activity
+            Activity act = activity[activity.length - (1 + j)];
+            //check if the agent skill contains the demand and add to the HashMap
+            Skill s = new Execution(cas.getTriage(), act, cas, time);
+            if (isContains(s, capacity.getSkills()) && this.demands.contains(s)) {
+              activitiesAssignment.add(s);
+              //reduce agent capacity
+              capacityScore -= s.getScore();
+              //set time
+              time += s.getDuration();
+              //update site demands
+              this.reduceDemands(s);
+            }
+            j++;
+          }
+        }
+      }
+    }
+
+
+    return activitiesAssignment;
+  }
+
+
   public boolean isServiceRequired(Capacity skills, double timeArrival){
     //check time arrival
     if(isTimeArrivalRelevant(timeArrival)&&skills!=null){
       //check if disaster site demands  fits to agent skills.
       for(Skill s: demands){
-        if(skills.getCapacity().contains(s)){
+        if(skills.getSkills().contains(s)){
           return true;
         }
       }
@@ -437,15 +665,47 @@ public MessageBox getAgentMessageBox() {
   }
 
 public void addRelevantAgent(Agent agent){
-    this.relevantAgentsUtility.put(agent,-1.0);
+    Vector<Skill> skills=new Vector<>();
+    this.relevantAgentsUtility.put(agent,skills);
     this.relevantAgentsTimeArrival.put(agent,0.0);
 }
+
+public int getUrgentCasAmount(){
+    int count=0;
+    for(Casualty cas:casualties){
+      if (cas.triage==Triage.URGENT){
+        count++;
+      }
+    }
+    return count;
+}
+
+  public int getMediumCasAmount(){
+    int count=0;
+    for(Casualty cas:casualties){
+      if (cas.triage==Triage.MEDIUM){
+        count++;
+      }
+    }
+    return count;
+  }
+
+  public int getNonUrgentCasAmount(){
+    int count=0;
+    for(Casualty cas:casualties){
+      if (cas.triage==Triage.NONURGENT){
+        count++;
+      }
+    }
+    return count;
+  }
 
 //***********************************************************//
 
 
   public String toString(){
-    return "\nDisaster site: "+this.id+" init score: "+this.initScore+" remain cover: "+this.remainCover+" number of casualties on site: "+casualties.size()+" time arrival: "+ this.getStartTime();
+    return "\nDisaster site: "+this.id+" init score: "+this.initScore+" remain cover (algorithm): "+this.remainCoverByCurrentAllocation;
+//            +" number of casualties on site: "+casualties.size()+" time arrival: "+ this.getStartTime();
   }
 }
 //  private HashMap<Triage,Integer> triageNum;

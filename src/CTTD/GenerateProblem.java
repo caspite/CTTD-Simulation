@@ -90,14 +90,15 @@ public class GenerateProblem {
     }
 
 
-    private void CreateCas(Triage trg,int ID){
+    private void CreateCas(Triage trg,int id,int dsId){
         double survival = Probabilities.getSurvival(trg,Tnow,Tnow);
-        DisasterSite ds=(DisasterSite) getDisasterSiteById(ID);
+        DisasterSite ds=(DisasterSite) getDisasterSiteById(dsId);
 
-        Casualties.add(new Casualty(trg, Casualty.Status.WATING,survival,ID,DS_ID,Tnow,ds));
-        tempCasualties.add(new Casualty(trg, Casualty.Status.WATING,survival,ID,DS_ID,Tnow,ds));
+        Casualties.add(new Casualty(trg, Casualty.Status.WATING,survival, id,DS_ID,Tnow,ds));
+        tempCasualties.add(new Casualty(trg, Casualty.Status.WATING,survival, id,DS_ID,Tnow,ds));
     }
     private Task getDisasterSiteById(int id){
+
         for(Task ds:DisasterSites){
             if (ds.getId()==id){
                 return ds;
@@ -144,9 +145,9 @@ public class GenerateProblem {
     //----------------------Main--------------------------------------//
     public void generateNewProblem() {
         double rnd;
-
+        int j=0;
         while (Tnow <= Tmax) {
-            int seed = (int) Tnow;
+            int seed = (int) (Tnow+1)*j;
             resetDsaSeed(seed);
             rnd = rNewDS.nextDouble();
             int priority = setPriority();
@@ -163,7 +164,7 @@ public class GenerateProblem {
                         Cas_ID = getCasId(tempID += 1,disasterSiteId);
                         rnd = rTriage.nextDouble();
                        Triage trg=getTriage(rnd);
-                        CreateCas(trg, Cas_ID);
+                        CreateCas(trg, Cas_ID, disasterSiteId);
                     }
                 }
                 if (empty==true){
@@ -171,7 +172,7 @@ public class GenerateProblem {
                     Cas_ID = getCasId(tempID += 1,disasterSiteId);
                     rnd = rTriage.nextDouble();
                     Triage trg=getTriage(rnd);
-                    CreateCas(trg, Cas_ID);
+                    CreateCas(trg, Cas_ID,disasterSiteId );
                 }
             //add casualties to disaster site
                 ((DisasterSite)DisasterSites.elementAt(DisasterSites.size()-1)).setInitCasualties(tempCasualties);
@@ -179,9 +180,10 @@ public class GenerateProblem {
                 ((DisasterSite)DisasterSites.elementAt(DisasterSites.size()-1)).setPriority();
 
             }
-
-
-            Tnow += 1;
+            j++;
+            if(getDisasterSites().size()>5){
+                Tnow += 1;
+            }
         }
         //create new MU
         for (int i = 0; i < amountMU; i++) {
@@ -203,16 +205,39 @@ public class GenerateProblem {
             CreateMU(agt, id);
         }
         CreateHospital(calcId(3,1));
+        updateDisasterSiteEvacuationTime(getHospitals(),getDisasterSites());
         createDiaryEvent(DisasterSites);
         WriteToFile.CTTD_MedicalUnits("CTTD_MedicalUnits.csv", this.MedicalUnits);
         WriteToFile.CTTD_DisasterSite("CTTD_DisasterSite.csv",this.DisasterSites);
         WriteToFile.CTTD_Casualties("CTTD_Casualties.csv",this.Casualties);
         System.out.println("finished generate new problem");
-        System.out.println(DisasterSites);
-        System.out.println(MedicalUnits);
-        System.out.println(Casualties);
+//        System.out.println(DisasterSites);
+//        System.out.println(MedicalUnits);
+//        System.out.println(Casualties);
 
     }
+
+    private void updateDisasterSiteEvacuationTime(Vector<Hospital> hospitals,Vector<Task> tasks){
+        for(Task task:tasks){
+           Hospital hospital = getNearestHospital(task,hospitals);
+           double evacuationTime=task.getDistance(hospital)/60;
+           ((DisasterSite)task).setEvacuationTime(evacuationTime);
+        }
+    }
+
+    private Hospital getNearestHospital(Task task, Vector<Hospital>hospitals) {
+        double dis = Double.POSITIVE_INFINITY;
+        Hospital hospital = hospitals.get(0);
+        for (Hospital h : hospitals) {
+            double currentDis = task.getDistance(h);
+            if (currentDis < dis) {
+                dis = currentDis;
+                hospital = h;
+            }
+        }
+        return hospital;
+    }
+
     private int getCasId(int tempID,int DS_ID){
         String str = "" + DS_ID + tempID;
         Cas_ID = Integer.valueOf(str);
@@ -280,7 +305,7 @@ public class GenerateProblem {
             p = priorities.get((double) prop[2]);
 
         }
-        MaxCasForSite=p*2;
+//        MaxCasForSite=p*2;
         return p;
 
     }

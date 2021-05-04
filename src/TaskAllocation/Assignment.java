@@ -98,6 +98,12 @@ public class Assignment {
 
 //------------------------------------------------------------------------------------------//
 
+	//*** methods ***//
+	public void calcUtility(){
+		for(Skill s:agentAssignment){
+			this.utility+=((Execution)s).getUtility();
+		}
+	}
 
 	//------------------------getters and setters----------------------------------------//
 	public double getRatio() {
@@ -108,6 +114,13 @@ public class Assignment {
 		return type;
 	}
 
+	public void setPenalty(double penalty) {
+		this.penalty = penalty;
+	}
+
+	public double getUtility() {
+		return utility;
+	}
 
 	public Agent getAgent() {
 		return agent;
@@ -178,7 +191,11 @@ public class Assignment {
 //-------------------------- Activities Assignments---------------------------------------------//
 
 	public void activitiesAssignment() {
-		if (this.getTask() instanceof DisasterSite) {
+		if(this.agentAssignment.size()>0){
+			updateSchedule();
+
+		}
+		else if (this.getTask() instanceof DisasterSite) {
 			TreeMap<Double,Skill> actAs = ((DisasterSite) this.getTask()).activitiesAssignment(this);
 			schedule=new TreeMap<>();
 			schedule.putAll(actAs);
@@ -191,10 +208,19 @@ public class Assignment {
 		setEndTime(arrivalTime + duration);
 	}
 
+	private void updateSchedule() {
+		schedule = new TreeMap<>();
+		double time = this.arrivalTime;
+		for (int i = 0; i < agentAssignment.size(); i++) {
+			schedule.put(time, this.agentAssignment.get(i));
+			time += this.agentAssignment.get(i).getDuration();
+		}
+	}
+
+
 	private void calculateDuration() {
-		List<Skill> activities = new ArrayList<Skill>(schedule.size());
-		for (int i = 0; i < activities.size(); i++) {
-			duration += activities.get(i).getDuration();
+		for(Skill s:schedule.values()){
+			this.duration+=s.getDuration();
 		}
 	}
 
@@ -214,7 +240,7 @@ public class Assignment {
 			if(entry.getKey()<tnow){
 				//if finished
 				if(entry.getKey()+entry.getValue().getDuration()<=tnow){
-					finishedExecution((Execution)entry.getValue(),entry.getValue().getDuration());
+					finishedExecution((Execution)entry.getValue(),((Execution) entry.getValue()).getStartTime());
 					//remove execution from schedule
 					removeException.add(entry.getKey());
 				}
@@ -241,7 +267,7 @@ public class Assignment {
 		}
 	}
 
-	private void finishedExecution(Execution execution,double endTime){
+	private void finishedExecution(Execution execution,double time){
 		//close execution
 		execution.setFinished(true);
 
@@ -252,6 +278,7 @@ public class Assignment {
 		Casualty casualty=execution.getCas();
 		casualty.setActivity(execution.getActivity());
 		casualty.setStatus(casualty.getStatus());
+		casualty.updateCurrentRpm(time);
 
 		//reduce agent capacity
 		((MedicalUnit)this.agent).reduceCapacity(execution);
@@ -269,7 +296,7 @@ public class Assignment {
 		}
 		//if task is hospital task
 		if(this.task instanceof Hospital){
-		casualty.setFiniteSurvival(endTime);
+		casualty.setFiniteSurvival(time);
 		((MedicalUnit) this.agent).reloadCapacity();
 		this.agent.setStatus(WAITING);
 		//TODO - Update indices
@@ -289,12 +316,12 @@ public class Assignment {
 
 
 	private void stopExecution(Execution execution,double ratio){
-		execution.setPenalty((1-ratio)*(execution.getUtility()+1));
+		execution.setPenalty((1-ratio)*(execution.getUtility()));
 		//update assignment penalty for abandoned
-		this.penalty+=execution.getPenalty();
-	//update task demands
+		updatePenalty(execution);
+		//update task demands
 		((DisasterSite)this.task).updateDemands();
-
+		//todo- what the cas status if we are in the middle execution?
 	}
 	private void updatePenalty(Execution execution){
 		this.penalty+=execution.getPenalty();

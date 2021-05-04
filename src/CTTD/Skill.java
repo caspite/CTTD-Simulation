@@ -8,7 +8,7 @@ import java.util.Vector;
 
 public class Skill {
     private Activity activity;
-    private double duration;
+    protected double duration;
     private Triage triage;
     private double score;
 //----------------------------constructors------------------------------------------------------------//
@@ -25,7 +25,7 @@ public class Skill {
         this.triage=triage;
         setScore(triage);
         //TODO set duration by triage and activities
-        duration=10;
+        calcEstimateDuration(triage,activity);
     }
 
 //--------------------------getters and setters------------------------------------------------//
@@ -73,6 +73,24 @@ public class Skill {
                 break;
 
         }
+    }
+
+
+
+    // *** methods *** //
+
+    private void calcEstimateDuration(Triage triage,Activity act){
+        RPM temp = new RPM(triage);
+        if (act == Activity.UPLOADING){
+            duration=temp.getUploadingTime();
+        }
+        else if (act==Activity.TREATMENT){
+            duration= temp.getCareTime();
+        }
+        else if (act == Activity.TRANSPORT){
+            duration=10;
+        }
+
     }
 
     @Override

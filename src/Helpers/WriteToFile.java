@@ -7,7 +7,9 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import CTTD.Casualty;
+import CTTD.DisasterSite;
 import CTTD.MedicalUnit;
+import TaskAllocation.Agent;
 import TaskAllocation.Assignment;
 import TaskAllocation.Task;
 import TaskAllocation.Utility;
@@ -34,7 +36,7 @@ public class WriteToFile {
 		try {
 			BufferedWriter out = openFile2(fileName);
 			for(Casualty cas:Casualties){
-				String o = ""+cas.id+","+cas.DS_Id+","+cas.getTBorn()+","+cas.survival+","+cas.getTriage();
+				String o = ""+cas.id+","+cas.DS_Id+","+cas.getTBorn()+","+cas.getSurvival()+","+cas.getTriage();
 				out.write(o);
 				out.newLine();
 			}
@@ -82,6 +84,45 @@ public class WriteToFile {
 		}
 	}
 
+
+	public static void writeProblemLocations(String fileName,Vector<Task>tasks, Vector<Agent> agents){
+		try {
+
+
+			BufferedWriter out = openFile2(fileName);
+			String o = "Disaster Sites";
+			out.write(o);
+			out.newLine();
+			o="task id"+","+"long"+","+"lat"+","+"priority"+","+"init score"+","+
+					"number of urgent cas"+","+"number of medium cas"+","+
+					"number of non urgent cas";
+			out.write(o);
+			out.newLine();
+
+			for (Task task : tasks) {
+				o = "" + task.getId() + "," + task.getLocation().getLng()+
+						"," + task.getLocation().getLat()+ "," + ((DisasterSite)task).getPriority()+","+
+						+ ((DisasterSite)task).getRemainCover()+","+ ((DisasterSite)task).getUrgentCasAmount()+","+
+						((DisasterSite)task).getMediumCasAmount()+","+((DisasterSite)task).getNonUrgentCasAmount();
+				out.write(o);
+				out.newLine();
+			}
+			o="agent id"+","+"long"+","+"lat"+","+"type";
+			out.write(o);
+			out.newLine();
+			for(Agent agent:agents){
+				o = "" + agent.getId() + "," + agent.getLocation().getLng()+
+						"," + agent.getLocation().getLat()+ "," + ((MedicalUnit)agent).getOneAgentType();
+				out.write(o);
+				out.newLine();
+			}
+			out.close();
+		} catch (IOException e) {
+			System.err.println("Couldn't write to file");
+		}
+
+
+	}
 	/// write to file fishers algorithm output
 	public static void writeFisherOutpuToFile(Double[][] ds) {
 		try {

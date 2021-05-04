@@ -10,7 +10,7 @@ public class Hospital extends Task {
     int Availability;
     Vector<Casualty> casualties;
     static int HospitalNum;
-    Hospital(Location location, int id,int capacity){
+    public Hospital(Location location, int id, int capacity){
         	super(location,id);
         	this.Capacity=capacity;
         	casualties=new Vector<>();

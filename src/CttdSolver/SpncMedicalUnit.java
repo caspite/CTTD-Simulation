@@ -1,24 +1,19 @@
-package CTTD;
+package CttdSolver;
 
-import CttdSolver.ServiceMessage;
-import CttdSolver.UtilityMessage;
-import DCOP.MessageBox;
+import CTTD.*;
 import DCOP.Message;
+import DCOP.MessageBox;
 import PoliceTaskAllocation.AgentType;
-import TaskAllocation.*;
-
+import TaskAllocation.Agent;
+import TaskAllocation.Assignment;
+import TaskAllocation.Location;
+import TaskAllocation.Task;
 
 import java.util.*;
 
-public class MedicalUnit extends Agent implements Messageable {
+public class SpncMedicalUnit extends MedicalUnit{
 
-    //***Medical Unit variables***//
-    protected Capacity skills;
-    protected AgentType agentType;
-    boolean isFull;
-    Vector<Casualty> casualties; // the casualties that uploaded to the agent
-    private int decisionCounter;
-
+    int version;// 1- survival 2- Weighted survival 3-Shapli value
 
     //***Messages Variables***//
     MessageBox messageBox;
@@ -41,23 +36,22 @@ public class MedicalUnit extends Agent implements Messageable {
     private TreeMap<Double, Skill> currentTaskSchedule;// the current task schedule-upcoming
     protected Vector<Task> relevantTasks;//the current relevant tasks
 
+//**************************************************************************************//
 
-//---------------------------------------------Methods--------------------------------------------
+    //**** constructor ****//
+    public SpncMedicalUnit(int version){
+        super();
 
-
-    //***constructor***//
-    public MedicalUnit(Location location, int id, HashSet<AgentType> agentType) {
-        super(location, id, agentType);
+        this.version=version;
     }
 
-    public MedicalUnit(int id, AgentType agentType, Location loc) {
-        super();
-        this.id = id;
-        this.agentType = agentType;
-        this.location = loc;
-        skills = new Capacity(agentType);
-        isFull = false;
-        casualties = new Vector<>();
+    public SpncMedicalUnit(Location location, int id, HashSet<AgentType> agentType) {
+        super(location, id, agentType);
+        this.version=version;
+    }
+
+    public SpncMedicalUnit(int id, AgentType agentType, Location loc) {
+        super(id, agentType, loc);
         currentTaskSchedule = new TreeMap<>();
         this.schedule = new Vector<Assignment>();
         relevantTasksUtility=new HashMap<Task, Double> ();
@@ -70,122 +64,15 @@ public class MedicalUnit extends Agent implements Messageable {
 
     }
 
-    public MedicalUnit(){
-        super();
-    }
-
-    //*** main Methods ****//
-
-
-    //*** skills methods ****//
-    public void reduceCapacity(Skill skill) {
-        Activity act = skill.getActivity();
-        Triage trg = skill.getTriage();
-
-        skills.reduceCap(trg, act);
-        if (skills.getCurrentScore() <= 0) {
-            setIsFull(true);
-        }
-
-    }
-
-    public void reloadCapacity() {
-        this.skills.initializeCapacity(agentType);
-    }
-
-    public void updateCapacity(double time) {
-        //check which skills done reduce the capacity and remove from upcoming.
-
-        // Get a set of the entries
-        Set set = currentTaskSchedule.entrySet();
-
-        // Get an iterator
-        Iterator it = set.iterator();
-
-        // Display elements
-        while (it.hasNext()) {
-            Map.Entry me = (Map.Entry) it.next();
-            if ((double) me.getKey() < time)
-                continue;
-            else if ((double) me.getKey() < time) {
-                reduceCapacity((Skill) me.getValue());
-                currentTaskSchedule.remove(me.getKey());
-            }
-            System.out.print("Key is: " + me.getKey() + " & ");
-            System.out.println("Value is: " + me.getValue());
-        }
-    }
-//********************************************************//
-
-
-
-
     //*** getters & setters ***//
 
-    //Travel duration depends on the agent's type
-    @Override
-    public void setMovingTime(double dis) {
-        Probabilities.getTravelTime(dis, agentType);
+    public void setVersion(int version) {
+        this.version = version;
     }
 
-    public double getTravelTime(double dis) {
-        return Probabilities.getTravelTime(dis, agentType);
-
-    }
-
-    public AgentType getOneAgentType() {
-        return this.agentType;
-    }
-
-
-    public Capacity getAgentSkills() {
-        return skills;
-    }
-
-    //update activities schedule
-    private void setCurrentTaskSchedule(double time, Skill skill) {
-        currentTaskSchedule.put(time, skill);
-    }
-
-
-    public double getActivityTime(Triage trg, Activity act) {
-
-        return skills.getduration(trg, act);
-    }
-
-    private void setIsFull(boolean b) {
-        isFull = b;
-    }
-
-    public void setCasualties(Casualty cas) {
-        casualties.add(cas);
-    }
-
-    public void reduceCasualties(Casualty cas) {
-        casualties.removeElement(cas);
-    }
-
-    public Vector<Casualty> getCasualties() {
-        return casualties;
-    }
-
-    //agent lowering casualties on arrival to hospital
-    public void loweringCasualties(Hospital hospital, double tnow) {
-        //update casualties finite survival
-        for (Casualty cas : casualties) {
-            cas.setFiniteSurvival(tnow);
-        }
-        //add casualties to hospital
-        hospital.addCasualties(casualties);
-        //delete all casualties
-        casualties.clear();
-    }
 
     //*** Messages Methods ***//
 
-    public MessageBox getAgentMessageBox() {
-        return messageBox;
-    }
 
     protected void putMessagesInMailerMailBox() {
         mailer.collectMailFromAgent(this, messageToBeSent);
@@ -255,7 +142,7 @@ public class MedicalUnit extends Agent implements Messageable {
 
     private boolean IsItDoable(Message message, Task task) {
 
-       double startTime = ArrivalTimeAccordingToCurrentAllocation(task);
+        double startTime = ArrivalTimeAccordingToCurrentAllocation(task);
 
 
         Vector<Skill> skills =((UtilityMessage) message).getExecution();
@@ -279,11 +166,11 @@ public class MedicalUnit extends Agent implements Messageable {
 
     private double ArrivalTimeAccordingToCurrentAllocation(Task task) {
         double distance = getDistance(task);
-      for(int i=0;i<currentAssignment.length;i++) {
-          if(currentAssignment[i]!=null){
-              distance = currentAssignment[i].getTask().getDistance(task);
-          }
-      }
+        for(int i=0;i<currentAssignment.length;i++) {
+            if(currentAssignment[i]!=null){
+                distance = currentAssignment[i].getTask().getDistance(task);
+            }
+        }
         double timeArrival = nextTimeToAllocation + Probabilities.getTravelTime(distance, this.agentType);
         return timeArrival;
     }
@@ -301,7 +188,7 @@ public class MedicalUnit extends Agent implements Messageable {
     private void updateRelevantTaskUtility() {
         for (Task task : this.relevantTasksUtility.keySet()) {
             Message message = messageBox.getMessages().get(task.getId());
-            double utility = ((UtilityMessage) message).getRatio();
+            double utility = ((UtilityMessage) message).getUtility();
             relevantTasksUtility.replace(task,utility);
         }
 
@@ -374,21 +261,11 @@ public class MedicalUnit extends Agent implements Messageable {
         this.relevantTasksUtility.put(disasterSite, -1.0);
     }
 
-    //********************************************************//
-
-
-    @Override
-    public void recieveMessage(List<TaskAllocation.Message> msgs) {
-
-    }
-
-    @Override
-    public void createMessage(Messageable reciver, double context) {
-
-    }
-
 
     //*** getters && setters ***//
+    public MessageBox getAgentMessageBox() {
+        return messageBox;
+    }
 
 
     public void setAvailableSkillsForAllocation(Vector<Skill> availableSkillsForAllocation) {
@@ -425,10 +302,5 @@ public class MedicalUnit extends Agent implements Messageable {
         return currentAssignment;
     }
 
-    public String toString() {
-        return "\nMedical unit: " + this.id + " type : " + this.agentType + " " + this.skills;
 
-    }
 }
-
-

@@ -46,15 +46,15 @@ public class Probabilities {
             default:
                 throw new IllegalStateException("Unexpected value: " + triage);
         }
-        double Tnow;
+        double timeToSurvive;
         double prop  = Math.pow(1,(1/B2))*B1+Tborn;
-        Tnow=50+Tborn;
+        timeToSurvive =prop+Tborn;
 
-            return Tnow;
+            return timeToSurvive;
     }
 
     //calculate survival by triage and time
-    public static double getSurvival (Triage triage,double Tnow,double Tborn){
+    public static double getSurvival (Triage triage,double Tborn,double Tnow){
 
         double B0;
         double B1;

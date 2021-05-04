@@ -13,16 +13,29 @@ public class Output {
 
     //*** constructor ***//
 
-    public Output(){
+    public Output(int algorithm){
+
         globalCost=new HashMap<Integer,Double>();
+        if(algorithm==1){
+            this.algorithm="SpncDcop";
+        }
+
     }
 
     public void addGlobalCost(int iteration,double cost){
         globalCost.put(iteration,cost);
     }
 
-    public void writeToFile(double tnow){
-        WriteToFile.writeOutput("SpcnDcop.csv"+tnow,globalCost,algorithm);
+    public int getLength(){
+        return this.globalCost.size();
+    }
+
+    public HashMap<Integer, Double> getGlobalCost() {
+        return globalCost;
+    }
+
+    public void writeToFile(int agentNum, int taskNum, double tnow,int algorithmVer){
+        WriteToFile.writeOutput(this.algorithm+" "+algorithmVer+"_"+agentNum+" agents_"+taskNum+" task_"+tnow+"_.csv",globalCost,algorithm);
     }
 
 }

@@ -6,7 +6,7 @@ import org.w3c.dom.ls.LSOutput;
 import java.util.Vector;
 
 public class Capacity {
-   private Vector <Skill> capacity;
+   private Vector <Skill> skills;
    private double maxScore;//the maximum score that agent can achieve
    private double currentScore;
 
@@ -14,13 +14,22 @@ public class Capacity {
    //-----------constructor----------------------//
 
     public Capacity(AgentType type){
-        capacity=new Vector<>();
+        skills=new Vector<>();
         this.initializeCapacity(type);
         currentScore=maxScore;
 
     }
     public Capacity(Vector<Skill> skills){
-        this.capacity=skills;
+        this.skills=skills;
+    }
+    public Capacity(Vector<Skill> skills,double maxScore){
+        Vector<Skill> newSkills=new Vector<>();
+        for(Skill s:skills){
+            newSkills.add(new Skill(s.getTriage(),s.getActivity(),s.getDuration(),s.getScore()));
+        }
+        this.skills=newSkills;
+        this.maxScore=maxScore;
+        this.currentScore=maxScore;
     }
 
     public void initializeCapacity(AgentType type){
@@ -83,11 +92,11 @@ public class Capacity {
 
         //fined the first skill and remove from capacity
         //reduce current score
-        for(Skill s:capacity){
+        for(Skill s:skills){
             if (s.getActivity()==act&& s.getTriage()==trg){
                 currentScore=currentScore-s.getScore();
 
-                capacity.removeElement(s);
+                skills.removeElement(s);
                 break;
             }
         }
@@ -100,8 +109,8 @@ public class Capacity {
                     Skill skill = new Skill(trg, act[i]);
                     removeSkill(skill);
 
-                    for (int j = 0; j < cap-1; j++) {
-                        capacity.add(skill);
+                    for (int j = 0; j < cap; j++) {
+                        skills.add(skill);
                     }
                 }
             }
@@ -110,17 +119,17 @@ public class Capacity {
 
     private void removeSkill(Skill skill){
         //search skill and remove
-        for(int i=0;i<capacity.size();i++){
-            Skill s=capacity.get(i);
+        for(int i=0;i<skills.size();i++){
+            Skill s=skills.get(i);
             if (s.equals(skill)){
-                capacity.removeElement(s);
+                skills.removeElement(s);
             }
         }
     }
 
     public double getduration(Triage trg,Activity act){
         double duration=0;
-        for(Skill s:capacity){
+        for(Skill s:skills){
             if (s.getActivity()==act&& s.getTriage()==trg){
                 return s.getDuration();
             }
@@ -129,8 +138,8 @@ public class Capacity {
     }
 
     //----------------------getters and setters-----------------------------//
-    public Vector<Skill> getCapacity(){
-        return capacity;
+    public Vector<Skill> getSkills(){
+        return skills;
     }
 
     public double getCurrentScore(){
