@@ -16,7 +16,7 @@ public class SpcnDisasterSite extends DisasterSite {
 
 
     int version ; // 1- survival 2- Weighted survival 3-Shapli value
-
+    HashMap<Agent,Vector<Skill>> tempRelevantAgentsUtility=new HashMap<>();
 
     //***constructor***//
 
@@ -27,6 +27,7 @@ public class SpcnDisasterSite extends DisasterSite {
     public SpcnDisasterSite(Location location, int id, double startTime, int priority){
         super(location,id,startTime,priority);
         relevantAgentsUtility=new HashMap<>();
+        tempRelevantAgentsUtility=new HashMap<>();
         relevantAgentsTimeArrival=new HashMap<>();
         messageBox=new MessageBox(this.id);
         messageToBeSent=new Vector<>();
@@ -67,7 +68,13 @@ public class SpcnDisasterSite extends DisasterSite {
 
     //*** SPCN methods ***//
 
-
+    public void addRelevantAgent(Agent agent){
+        Vector<Skill> skills=new Vector<>();
+        Vector<Skill> skills1=new Vector<>();
+        this.relevantAgentsUtility.put(agent,skills);
+        this.tempRelevantAgentsUtility.put(agent,skills1);
+        this.relevantAgentsTimeArrival.put(agent,0.0);
+    }
     public void createFirstMessages(){
         messageToBeSent.clear();
         updateDemands();//update the demands according to casualties on site
@@ -90,14 +97,6 @@ public class SpcnDisasterSite extends DisasterSite {
         //sort all the relevant agents by the time arrival
         HashMap<Agent,Double> sortedAgentsByTimeArrival =sortByValue(relevantAgentsTimeArrival);
 
-//    for(Agent agent: sortedAgentsByTimeArrival.keySet()){
-//    Message message = messageBox.getMessages().get(agent.getId());
-//     double utility= createUtilityMessage(message);//execution is null if agent not relevant
-//      updateAgentsUtility(agent,utility);
-////      updateRemainCoverByCurrentAllocation(utility);
-////      System.out.println("agent: "+agent.getId()+ "utility"+ utility);
-//
-//    }
         while(!finishedAllocation()){
             sortedAgentsByTimeArrival =sortByValue(relevantAgentsTimeArrival);
             for(Agent agent: sortedAgentsByTimeArrival.keySet()){
@@ -162,10 +161,10 @@ public class SpcnDisasterSite extends DisasterSite {
             double ratio = calcRatio(executions);
 
             Utility utility;
-            if (version==1) {// the survival is the utility
+            if (version==0) {// the survival is the utility
                 utility= new RatioUtility(ratio);
             }
-            else if(version==2){
+            else if(version==1){
                 utility=new WeightedUtility(ratio);
 
             }
@@ -182,10 +181,10 @@ public class SpcnDisasterSite extends DisasterSite {
 
             Message newMessage = new UtilityMessage(this.id,agent.getId(),ratio,s,utility);
             messageToBeSent.add(newMessage);
-            System.out.println("utility message: task: "+this.id+" ratio: "+ratio+ "for agent: "+agent.getId());
+            System.out.println("utility "+((UtilityMessage)newMessage).getUtility() + "ratio: "+((UtilityMessage)newMessage).getRatio() );
         }
     }
-    private void updateAgent(Vector<Skill> allocation,Agent agent){
+    protected void updateAgent(Vector<Skill> allocation,Agent agent){
         double duration=0;
         for(int i=0;i<allocation.size();i++){
             duration+=allocation.get(i).getDuration();
@@ -205,22 +204,35 @@ public class SpcnDisasterSite extends DisasterSite {
 
     }
 
-    private Capacity calcAvailableCapacity(Agent agent,Capacity capacity){
+    protected Capacity calcAvailableCapacity(Agent agent,Capacity capacity){
+        Capacity newCap=new Capacity(capacity.getSkills(),capacity.getCurrentScore());
         Vector<Skill> skill = relevantAgentsUtility.get(agent);
-        capacity.getSkills().removeAll(skill);
-        return capacity;
+        for(Skill s:skill){
+            for(int i=0;i< newCap.getSkills().size();i++){
+               Skill s1=newCap.getSkills().get(i);
+                if(s1.getTriage()==s.getTriage()&&s1.getActivity()==s.getActivity()){
+                    newCap.getSkills().remove(s1);
+                    break;
+                }
+
+            }
+        }
+        return newCap;
     }
 
-    private Casualty getNextCasualty(Agent agent,double time){
+    protected Casualty getNextCasualty(Agent agent,double time){
         //start with the urgent casualty
-        this.sortCasualtiesBySurvival();
-        for(int i=0; i< casualties.size();i++) {
-            Casualty cas = casualties.get(i);
-            if (CasualtyAllocated(cas)||!cas.isAgentRequired((MedicalUnit) agent,time)) {
-                continue;
-            } else
-                return cas;
+        if(time>-1.0){
+            this.sortCasualtiesBySurvival();
+            for(int i=0; i< casualties.size();i++) {
+                Casualty cas = casualties.get(i);
+                if (CasualtyAllocated(cas)||!cas.isAgentRequired((MedicalUnit) agent,time)) {
+                    continue;
+                } else
+                    return cas;
+            }
         }
+
         return null;
     }
 
@@ -232,7 +244,7 @@ public class SpcnDisasterSite extends DisasterSite {
         return false;
     }
 
-    private Vector<Skill> allocateActivitiesToCasualty(Casualty cas,Capacity capacity,double arrivalTime) {
+    protected Vector<Skill> allocateActivitiesToCasualty(Casualty cas,Capacity capacity,double arrivalTime) {
         Vector<Skill> activitiesAssignment = new Vector<>();
         double capacityScore = capacity.getCurrentScore();
         double time = arrivalTime;
@@ -300,33 +312,33 @@ public class SpcnDisasterSite extends DisasterSite {
         this.mailer.collectMailFromTask(this,messageToBeSent);
     }
 
-    public double createUtilityMessage(Message message){
-        Vector<Skill> executions = calcExecution(((ServiceMessage)message).getCapacity(),((ServiceMessage)message).getTimeArrival());
-        double ratio = calcRatio(executions);
-        Utility utility;
-        if (version==1) {// the survival is the utility
-            utility= new RatioUtility(ratio);
-        }
-            else if(version==2){
-            utility=new WeightedUtility(ratio);
-
-        }
-            else if(version==3){
-            utility=new ShapleyUtility();
-
-        }
-            else{
-            utility= new RatioUtility(ratio);
-        }
-            utility.calculateUtility();
-
-
-
-
-        Message newMessage = new UtilityMessage(this.id,message.getSenderId(),ratio,executions,utility);
-        messageToBeSent.add(newMessage);
-        return ((UtilityMessage)newMessage).getUtility();
-    }
+//    public double createUtilityMessage(Message message){
+//        Vector<Skill> executions = calcExecution(((ServiceMessage)message).getCapacity(),((ServiceMessage)message).getTimeArrival());
+//        double ratio = calcRatio(executions);
+//        Utility utility;
+//        if (version==1) {// the survival is the utility
+//            utility= new RatioUtility(ratio);
+//        }
+//            else if(version==2){
+//            utility=new WeightedUtility(ratio);
+//
+//        }
+//            else if(version==3){
+//            utility=new ShapleyUtility(this,agent);
+//
+//        }
+//            else{
+//            utility= new RatioUtility(ratio);
+//        }
+//            utility.calculateUtility();
+//
+//
+//
+//
+//        Message newMessage = new UtilityMessage(this.id,message.getSenderId(),ratio,executions,utility);
+//        messageToBeSent.add(newMessage);
+//        return ((UtilityMessage)newMessage).getUtility();
+//    }
 
     private Vector<Skill> calcExecution(Capacity capacity,double timeArrival){
         Vector<Skill> executions;
@@ -431,14 +443,218 @@ public class SpcnDisasterSite extends DisasterSite {
         return temp;
     }
 
+    private double calcUtility(){
+        double allUtilities=0.0;
+        for(Agent agent:relevantAgentsUtility.keySet()){
+            allUtilities+=  calcRatio(relevantAgentsUtility.get(agent));
+        }
+        return allUtilities;
+    }
+
     //**** Shapley ****//
 
     public double calcShapleyValue(Agent agent){
+//        System.out.println("Calc Shapley for agent: "+agent.getId());
+    double shapley=0.0;
+    double allUtilities= calcUtility();
+//        System.out.println("all Utilities "+allUtilities);
 
+    double allAgentsScore =allUtilities;
+
+    double scoreWhitOutAgents = scoreOnSiteWithoutAgent(agent);
+//        System.out.println("score without agent: "+scoreWhitOutAgents  );
+//        System.out.println("all Utilities-ufter "+calcUtility());
+    shapley=allAgentsScore-scoreWhitOutAgents;
+    return shapley;
+
+    }
+    //TODO-shaply- get the next agent - check if he can treat the same cas- if so- calc the cas survival at the next time.
+    //TODO go to the next agent
+
+    public double calcHeuristicShapley(Agent agent){
+        double shaply=0.0;
+        updateAgentsTimeArrivalMap();
+        Casualty casualty =returnAgentCasualty(agent);
+        if (casualty ==null){
+            return shaply;
+        }
+        double currentAgentTimeArrival=getAgentTimeArrival(agent);
+        double nextTime=finedNextAgentTime(casualty,currentAgentTimeArrival); //get the next agent that can
+
+        double currentRatio = casualty.calcSurvivalByTime(currentAgentTimeArrival);
+        if(nextTime==-1){
+            return currentRatio;
+        }
+        double nextRatio = casualty.calcSurvivalByTime(nextTime);
+        shaply=currentRatio-nextRatio;
+        return shaply;
+    }
+
+   private double finedNextAgentTime(Casualty casualty,double curAgentTime){
+       HashMap<Agent, Double> relevantAgentsTimeArrivalSorted= sortByValue(relevantAgentsTimeArrival);
+        for(Agent agent: relevantAgentsTimeArrivalSorted.keySet()){
+            double time=relevantAgentsTimeArrivalSorted.get(agent);
+            if(time<=curAgentTime)
+                continue;
+            else if(time>curAgentTime){
+                if(casualty.isAgentRequired((MedicalUnit)agent,time))
+                    return time;
+            }
+        }
+        return -1;
+   }
+
+    private double getAgentTimeArrival(Agent agent){
+       return relevantAgentsTimeArrival.get(agent);
+    }
+
+    private Casualty returnAgentCasualty(Agent agent){
+       for( Skill s:relevantAgentsUtility.get(agent)){
+           if(s instanceof Execution){
+              return  ((Execution)s).getCas();
+           }
+       }
+       return null;
+    }
+
+//    protected double scoreOnSiteWithAgent() {
+//        Vector<Skill> allocations=new Vector<>();
+//        updateTempUtilities();
+//        allocatedCasualties.clear();
+//        updateDemands();//update the demands according to casualties on site
+//        updateAgentsTimeArrivalMap();
+//        relevantAgentsTempUtilityClearUtility();
+//        //sort all the relevant agents by the time arrival
+//        HashMap<Agent, Double> sortedAgentsByTimeArrival;
+//
+//        while (!finishedAllocation()) {
+//            sortedAgentsByTimeArrival = sortByValue(relevantAgentsTimeArrival);
+//            for (Agent agent : sortedAgentsByTimeArrival.keySet()) {
+//                Message message = messageBox.getMessages().get(agent.getId());
+//                Capacity availableCapacity = calcTempAvailableCapacity(agent, ((ServiceMessage) message).getCapacity());
+//                double arrivalTime = sortedAgentsByTimeArrival.get(agent);
+//                Casualty casualty = getNextCasualty(agent, arrivalTime);
+//                if (casualty == null) {
+//                    relevantAgentsTimeArrival.replace(agent, -1.0);
+//                    continue;
+//                }
+//                Vector<Skill> allocation = allocateActivitiesToCasualty(casualty, availableCapacity, arrivalTime);
+//
+//
+//                if (allocation.size() <= 0) {
+//                    relevantAgentsTimeArrival.replace(agent, -1.0);
+//                    continue;
+//                }
+//
+//                updateAgentTimeArrival(allocation, agent);
+//                allocations.addAll(allocation);
+//
+//                updateTempAgentsUtility(agent,allocation);
+//
+//                break;
+//            }
+//
+//        }
+//        double ratio = calcRatio(allocations);
+//        return ratio;
+//    }
+
+    private void updateAgentTimeArrival(Vector<Skill> allocation,Agent agent){
+        double duration=0;
+        for(int i=0;i<allocation.size();i++){
+            duration+=allocation.get(i).getDuration();
+        }
+        duration+=relevantAgentsTimeArrival.get(agent);
+        relevantAgentsTimeArrival.replace(agent,duration);
+    }
+
+    protected double scoreOnSiteWithoutAgent(Agent nanParticipantAgent) {
+        Vector<Skill> allocations=new Vector<>();
+    allocatedCasualties.clear();
+    updateDemands();//update the demands according to casualties on site
+    updateAgentsTimeArrivalMap();
+    relevantAgentsTempUtilityClearUtility();
+    //sort all the relevant agents by the time arrival
+    HashMap<Agent, Double> sortedAgentsByTimeArrival;
+        relevantAgentsTimeArrival.replace(nanParticipantAgent, -1.0);
+
+    while (!finishedAllocation()) {
+        sortedAgentsByTimeArrival = sortByValue(relevantAgentsTimeArrival);
+        for (Agent agent : sortedAgentsByTimeArrival.keySet()) {
+            Message message = messageBox.getMessages().get(agent.getId());
+            Capacity availableCapacity = calcTempAvailableCapacity(agent, ((ServiceMessage) message).getCapacity());
+            double arrivalTime = sortedAgentsByTimeArrival.get(agent);
+            Casualty casualty = getNextCasualty(agent, arrivalTime);
+            if (casualty == null) {
+                relevantAgentsTimeArrival.replace(agent, -1.0);
+                continue;
+            }
+            Vector<Skill> allocation = allocateActivitiesToCasualty(casualty, availableCapacity, arrivalTime);
+
+
+            if (allocation.size() <= 0) {
+                relevantAgentsTimeArrival.replace(agent, -1.0);
+                continue;
+            }
+
+            updateAgentTimeArrival(allocation, agent);
+            allocations.addAll(allocation);
+            updateTempAgentsUtility(agent,allocation);
+            break;
+        }
+
+    }
+    double ratio = calcRatio(allocations);
+    return ratio;
+}
+
+    private void updateTempAgentsUtility(Agent agent,Vector<Skill> skills){
+        Vector<Skill> s=new Vector<>();
+        for(Skill sk:skills){
+            Execution ex=new Execution(sk.getTriage(),sk.getActivity(),((Execution)sk).getCas(),((Execution)sk).getStartTime(),((Execution)sk).getUtility());
+            s.add(ex);
+        }
+        if(this.tempRelevantAgentsUtility.get(agent)==null){
+            this.tempRelevantAgentsUtility.replace(agent,s);
+        }
+        else{
+            this.tempRelevantAgentsUtility.get(agent).addAll(s);
+        }
 
     }
 
 
+    private Capacity calcTempAvailableCapacity(Agent agent,Capacity capacity){
+        Capacity newCap=new Capacity(capacity.getSkills(),capacity.getCurrentScore());
+        Vector<Skill> skill = tempRelevantAgentsUtility.get(agent);
+        for(Skill s:skill){
+            for(int i=0;i< newCap.getSkills().size();i++){
+                Skill s1=newCap.getSkills().get(i);
+                if(s1.getTriage()==s.getTriage()&&s1.getActivity()==s.getActivity()){
+                    newCap.getSkills().remove(s1);
+                    break;
+                }
+            }
+        }
+        return newCap;
+    }
 
+    private void relevantAgentsTempUtilityClearUtility(){
+        for(Agent a:tempRelevantAgentsUtility.keySet()){
+            tempRelevantAgentsUtility.get(a).removeAllElements();
+        }
+    }
 
+//   private double calcAllRatios( ){
+//        double allScores=0;
+//       for(Agent agent:relevantAgentsUtility.keySet()){
+//           Vector <Skill> executions = relevantAgentsUtility.get(agent);
+//           Vector<Skill> s=new Vector<>();
+//           double ratio =calcRatio(executions);
+//           allScores+=ratio;
+//
+//       }
+//       System.out.println(""+allScores);
+//       return allScores;
+//   }
 }

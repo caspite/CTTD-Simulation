@@ -22,7 +22,7 @@ public class Agent implements Distancable, Serializable {
 	protected boolean isWaiting;
 	protected transient Assignment currentTask;// / his current task
 	protected int currentTaskID;
-	protected double speed=60;
+	protected double speed=50;
 	protected Status status;//
 	protected Vector<Assignment> schedule;//the agent *upcoming* schedule.
 											// one assignment for each task -

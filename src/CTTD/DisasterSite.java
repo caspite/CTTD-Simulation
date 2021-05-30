@@ -142,6 +142,7 @@ public class DisasterSite extends MissionEvent  {
     }
     for(Casualty cas:this.finishedCasualties){
       this.remainCover += cas.getFiniteSurvival();
+
     }
   }
 
@@ -438,7 +439,7 @@ public MessageBox getAgentMessageBox() {
       System.out.println("utility message: task: "+this.id+" utility: "+utility+ "for agent: "+agent.getId());
     }
   }
-  private void updateAgent(Vector<Skill> allocation,Agent agent){
+  protected void updateAgent(Vector<Skill> allocation,Agent agent){
     double duration=0;
     for(int i=0;i<allocation.size();i++){
       duration+=allocation.get(i).getDuration();
@@ -458,13 +459,13 @@ public MessageBox getAgentMessageBox() {
 
   }
 
-  private Capacity calcAvailableCapacity(Agent agent,Capacity capacity){
+  protected Capacity calcAvailableCapacity(Agent agent,Capacity capacity){
    Vector<Skill> skill = relevantAgentsUtility.get(agent);
    capacity.getSkills().removeAll(skill);
     return capacity;
   }
 
-  private Casualty getNextCasualty(Agent agent,double time){
+  protected Casualty getNextCasualty(Agent agent,double time){
     //start with the urgent casualty
     this.sortCasualtiesBySurvival();
     for(int i=0; i< casualties.size();i++) {
@@ -485,7 +486,7 @@ public MessageBox getAgentMessageBox() {
    return false;
   }
 
-  private Vector<Skill> allocateActivitiesToCasualty(Casualty cas,Capacity capacity,double arrivalTime) {
+  protected Vector<Skill> allocateActivitiesToCasualty(Casualty cas, Capacity capacity, double arrivalTime) {
     Vector<Skill> activitiesAssignment = new Vector<>();
     double capacityScore = capacity.getCurrentScore();
     double time = arrivalTime;
@@ -667,7 +668,8 @@ public MessageBox getAgentMessageBox() {
 public void addRelevantAgent(Agent agent){
     Vector<Skill> skills=new Vector<>();
     this.relevantAgentsUtility.put(agent,skills);
-    this.relevantAgentsTimeArrival.put(agent,0.0);
+
+  this.relevantAgentsTimeArrival.put(agent,0.0);
 }
 
 public int getUrgentCasAmount(){

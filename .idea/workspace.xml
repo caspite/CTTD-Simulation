@@ -11,43 +11,24 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="dad0e351-8672-41d4-adba-1c621b98d119" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/CTTD/RPM.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/CTTD/RpmStatic.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/CttdSolver/RatioUtility.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/CttdSolver/ShapleyUtility.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/CttdSolver/SpcnDisasterSite.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/CttdSolver/SpncMedicalUnit.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/CttdSolver/Utility.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/CttdSolver/WeightedUtility.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/StaticCTTD/GenerateStaticProblem.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/StaticCTTD/StaticAllocation.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/CttdSolver/Greedy.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/CttdSolver/GreedyDisasterSite.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/CttdSolver/GreedyMedicalUnit.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Helpers/WriteToFile.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Helpers/WriteToFile.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/PoliceTaskAllocation/AgentArrivesToEvent.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/PoliceTaskAllocation/AgentArrivesToEvent.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/PoliceTaskAllocation/MissionEvent.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/PoliceTaskAllocation/MissionEvent.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/TaskAllocation/Assignment.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/TaskAllocation/Assignment.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/TaskAllocation/Task.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/TaskAllocation/Task.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/TaskAllocation/Agent.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/TaskAllocation/Agent.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/CTTD/Capacity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/CTTD/Capacity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/CTTD/Casualty.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/CTTD/Casualty.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/CTTD/DisasterSite.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/CTTD/DisasterSite.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/CTTD/Execution.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/CTTD/Execution.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/CTTD/GenerateProblem.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/CTTD/GenerateProblem.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/CTTD/Hospital.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/CTTD/Hospital.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CTTD/Distance.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/CTTD/Distance.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/CTTD/MainTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/CTTD/MainTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/CTTD/MedicalUnit.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/CTTD/MedicalUnit.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/CTTD/Probabilities.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/CTTD/Probabilities.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/CTTD/Skill.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/CTTD/Skill.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/CTTD/mainSimulation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/CTTD/mainSimulation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CttdSolver/ShapleyUtility.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/CttdSolver/ShapleyUtility.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CttdSolver/Solver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/CttdSolver/Solver.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/CttdSolver/SpcnDcop.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/CttdSolver/SpcnDcop.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/CttdSolver/UtilityMessage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/CttdSolver/UtilityMessage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/DCOP/Output.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/DCOP/Output.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Helpers/WriteToFile.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Helpers/WriteToFile.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/PoliceTaskAllocation/AgentArrivesToEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/PoliceTaskAllocation/AgentArrivesToEvent.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/PoliceTaskAllocation/AgentType.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/PoliceTaskAllocation/AgentType.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/PoliceTaskAllocation/MissionEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/PoliceTaskAllocation/MissionEvent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CttdSolver/SpcnDisasterSite.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/CttdSolver/SpcnDisasterSite.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CttdSolver/SpncMedicalUnit.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/CttdSolver/SpncMedicalUnit.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/StaticCTTD/GenerateStaticProblem.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/StaticCTTD/GenerateStaticProblem.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/StaticCTTD/StaticAllocation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/StaticCTTD/StaticAllocation.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/TaskAllocation/Agent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/TaskAllocation/Agent.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/TaskAllocation/Assignment.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/TaskAllocation/Assignment.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/TaskAllocation/Task.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/TaskAllocation/Task.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,7 +45,7 @@
     </option>
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_COMMON_BRANCH" value="18022021" />
+    <option name="RECENT_COMMON_BRANCH" value="04052021" />
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="ROOT_SYNC" value="SYNC" />
   </component>
@@ -84,7 +65,7 @@
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.2" />
-    <property name="settings.editor.selected.configurable" value="Template Data Languages" />
+    <property name="settings.editor.selected.configurable" value="org.jetbrains.plugins.github.ui.GithubSettingsConfigurable" />
   </component>
   <component name="RecentsManager">
     <key name="CopyClassDialog.RECENTS_KEY">
@@ -185,7 +166,13 @@
       <option name="presentableId" value="LOCAL‎00005" />
       <updated>1613872387533</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL‎00006" summary="scnp- seport different version">
+      <created>1620145873601</created>
+      <option name="number" value="LOCAL‎00006" />
+      <option name="presentableId" value="LOCAL‎00006" />
+      <updated>1620145873601</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -207,114 +194,123 @@
     <MESSAGE value="disaster site sent message code- before D-bug" />
     <MESSAGE value="disaster site sent message code- before D-bug&#10;medical unit sent message code- befor D-bug" />
     <MESSAGE value="SPCN working - need to check for bugs... the output is not corect." />
-    <option name="LAST_COMMIT_MESSAGE" value="SPCN working - need to check for bugs... the output is not corect." />
+    <MESSAGE value="scnp- seport different version" />
+    <option name="LAST_COMMIT_MESSAGE" value="scnp- seport different version" />
   </component>
   <component name="WindowStateProjectService">
     <state x="96" y="0" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1616319185086">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
     <state x="96" y="0" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1280.680/1920.0.1920.1040@0.0.1280.680" timestamp="1616319185086" />
-    <state x="424" y="248" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.packages" timestamp="1613461418159">
-      <screen x="0" y="0" width="1280" height="680" />
-    </state>
-    <state x="424" y="248" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.packages/0.0.1280.680@0.0.1280.680" timestamp="1613461418159" />
     <state x="173" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1620120516878">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
     <state x="173" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1280.680/1920.0.1920.1040@0.0.1280.680" timestamp="1620120516878" />
-    <state x="251" y="0" width="740" height="445" key="CommitChangelistDialog2" timestamp="1613872380420">
+    <state x="251" y="0" width="740" height="445" key="CommitChangelistDialog2" timestamp="1620145865924">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state x="251" y="0" key="CommitChangelistDialog2/0.0.1280.680/1920.0.1920.1040@0.0.1280.680" timestamp="1613551954555" />
-    <state x="2297" y="0" width="745" height="680" key="CommitChangelistDialog2/0.0.1280.680/1920.0.1920.1040@1920.0.1920.1040" timestamp="1613648831821" />
-    <state x="251" y="0" width="740" height="445" key="CommitChangelistDialog2/0.0.1280.680@0.0.1280.680" timestamp="1613872380420" />
-    <state width="515" height="466" key="DebuggerActiveHint" timestamp="1620140316843">
+    <state x="251" y="0" width="740" height="445" key="CommitChangelistDialog2/0.0.1280.680@0.0.1280.680" timestamp="1620145865924" />
+    <state width="570" height="466" key="DebuggerActiveHint" timestamp="1620328529359">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="515" height="466" key="DebuggerActiveHint/0.0.1280.680/1920.0.1920.1040@0.0.1280.680" timestamp="1620140316843" />
-    <state width="726" height="713" key="DebuggerActiveHint/0.0.1280.680/1920.0.1920.1040@1920.0.1920.1040" timestamp="1614120064178" />
+    <state width="570" height="466" key="DebuggerActiveHint/0.0.1280.680/1920.0.1920.1040@0.0.1280.680" timestamp="1620328529359" />
+    <state width="726" height="713" key="DebuggerActiveHint/0.0.1280.680/1920.0.1920.1040@1920.0.1920.1040" timestamp="1620300342859" />
     <state width="515" height="466" key="DebuggerActiveHint/0.0.1280.680@0.0.1280.680" timestamp="1619425884457" />
-    <state width="1237" height="298" key="GridCell.Tab.0.bottom" timestamp="1620141616303">
+    <state width="1237" height="200" key="GridCell.Tab.0.bottom" timestamp="1620329171705">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1237" height="298" key="GridCell.Tab.0.bottom/0.0.1280.680/1920.0.1920.1040@0.0.1280.680" timestamp="1620141616303" />
-    <state width="1877" height="463" key="GridCell.Tab.0.bottom/0.0.1280.680/1920.0.1920.1040@1920.0.1920.1040" timestamp="1614124331643" />
-    <state width="1237" height="132" key="GridCell.Tab.0.bottom/0.0.1280.680@0.0.1280.680" timestamp="1619426548240" />
-    <state width="1237" height="298" key="GridCell.Tab.0.center" timestamp="1620141616303">
+    <state width="1237" height="200" key="GridCell.Tab.0.bottom/0.0.1280.680/1920.0.1920.1040@0.0.1280.680" timestamp="1620329171705" />
+    <state width="914" height="505" key="GridCell.Tab.0.bottom/0.0.1280.680/1920.0.1920.1040@1920.0.1920.1040" timestamp="1620301225150" />
+    <state width="1237" height="139" key="GridCell.Tab.0.bottom/0.0.1280.680@0.0.1280.680" timestamp="1620145801602" />
+    <state width="1237" height="200" key="GridCell.Tab.0.center" timestamp="1620329171705">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1237" height="298" key="GridCell.Tab.0.center/0.0.1280.680/1920.0.1920.1040@0.0.1280.680" timestamp="1620141616303" />
-    <state width="1877" height="463" key="GridCell.Tab.0.center/0.0.1280.680/1920.0.1920.1040@1920.0.1920.1040" timestamp="1614124331643" />
-    <state width="1237" height="132" key="GridCell.Tab.0.center/0.0.1280.680@0.0.1280.680" timestamp="1619426548240" />
-    <state width="1237" height="298" key="GridCell.Tab.0.left" timestamp="1620141616303">
+    <state width="1237" height="200" key="GridCell.Tab.0.center/0.0.1280.680/1920.0.1920.1040@0.0.1280.680" timestamp="1620329171705" />
+    <state width="914" height="505" key="GridCell.Tab.0.center/0.0.1280.680/1920.0.1920.1040@1920.0.1920.1040" timestamp="1620301225150" />
+    <state width="1237" height="139" key="GridCell.Tab.0.center/0.0.1280.680@0.0.1280.680" timestamp="1620145801598" />
+    <state width="1237" height="200" key="GridCell.Tab.0.left" timestamp="1620329171705">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1237" height="298" key="GridCell.Tab.0.left/0.0.1280.680/1920.0.1920.1040@0.0.1280.680" timestamp="1620141616303" />
-    <state width="1877" height="463" key="GridCell.Tab.0.left/0.0.1280.680/1920.0.1920.1040@1920.0.1920.1040" timestamp="1614124331643" />
-    <state width="1237" height="132" key="GridCell.Tab.0.left/0.0.1280.680@0.0.1280.680" timestamp="1619426548240" />
-    <state width="1237" height="298" key="GridCell.Tab.0.right" timestamp="1620141616303">
+    <state width="1237" height="200" key="GridCell.Tab.0.left/0.0.1280.680/1920.0.1920.1040@0.0.1280.680" timestamp="1620329171705" />
+    <state width="914" height="505" key="GridCell.Tab.0.left/0.0.1280.680/1920.0.1920.1040@1920.0.1920.1040" timestamp="1620301225150" />
+    <state width="1237" height="139" key="GridCell.Tab.0.left/0.0.1280.680@0.0.1280.680" timestamp="1620145801598" />
+    <state width="1237" height="200" key="GridCell.Tab.0.right" timestamp="1620329171705">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1237" height="298" key="GridCell.Tab.0.right/0.0.1280.680/1920.0.1920.1040@0.0.1280.680" timestamp="1620141616303" />
-    <state width="1877" height="463" key="GridCell.Tab.0.right/0.0.1280.680/1920.0.1920.1040@1920.0.1920.1040" timestamp="1614124331643" />
-    <state width="1237" height="132" key="GridCell.Tab.0.right/0.0.1280.680@0.0.1280.680" timestamp="1619426548240" />
-    <state width="1237" height="228" key="GridCell.Tab.1.bottom" timestamp="1620140493863">
+    <state width="1237" height="200" key="GridCell.Tab.0.right/0.0.1280.680/1920.0.1920.1040@0.0.1280.680" timestamp="1620329171705" />
+    <state width="914" height="505" key="GridCell.Tab.0.right/0.0.1280.680/1920.0.1920.1040@1920.0.1920.1040" timestamp="1620301225150" />
+    <state width="1237" height="139" key="GridCell.Tab.0.right/0.0.1280.680@0.0.1280.680" timestamp="1620145801598" />
+    <state width="1237" height="295" key="GridCell.Tab.1.bottom" timestamp="1620328760224">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1237" height="228" key="GridCell.Tab.1.bottom/0.0.1280.680/1920.0.1920.1040@0.0.1280.680" timestamp="1620140493863" />
-    <state width="1877" height="463" key="GridCell.Tab.1.bottom/0.0.1280.680/1920.0.1920.1040@1920.0.1920.1040" timestamp="1614124322522" />
+    <state width="1237" height="295" key="GridCell.Tab.1.bottom/0.0.1280.680/1920.0.1920.1040@0.0.1280.680" timestamp="1620328760224" />
+    <state width="914" height="505" key="GridCell.Tab.1.bottom/0.0.1280.680/1920.0.1920.1040@1920.0.1920.1040" timestamp="1620301225150" />
     <state width="1237" height="228" key="GridCell.Tab.1.bottom/0.0.1280.680@0.0.1280.680" timestamp="1619426169442" />
-    <state width="1237" height="228" key="GridCell.Tab.1.center" timestamp="1620140493863">
+    <state width="1237" height="295" key="GridCell.Tab.1.center" timestamp="1620328760224">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1237" height="228" key="GridCell.Tab.1.center/0.0.1280.680/1920.0.1920.1040@0.0.1280.680" timestamp="1620140493863" />
-    <state width="1877" height="463" key="GridCell.Tab.1.center/0.0.1280.680/1920.0.1920.1040@1920.0.1920.1040" timestamp="1614124322521" />
+    <state width="1237" height="295" key="GridCell.Tab.1.center/0.0.1280.680/1920.0.1920.1040@0.0.1280.680" timestamp="1620328760224" />
+    <state width="914" height="505" key="GridCell.Tab.1.center/0.0.1280.680/1920.0.1920.1040@1920.0.1920.1040" timestamp="1620301225150" />
     <state width="1237" height="228" key="GridCell.Tab.1.center/0.0.1280.680@0.0.1280.680" timestamp="1619426169441" />
-    <state width="1237" height="228" key="GridCell.Tab.1.left" timestamp="1620140493863">
+    <state width="1237" height="295" key="GridCell.Tab.1.left" timestamp="1620328760224">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1237" height="228" key="GridCell.Tab.1.left/0.0.1280.680/1920.0.1920.1040@0.0.1280.680" timestamp="1620140493863" />
-    <state width="1877" height="463" key="GridCell.Tab.1.left/0.0.1280.680/1920.0.1920.1040@1920.0.1920.1040" timestamp="1614124322521" />
+    <state width="1237" height="295" key="GridCell.Tab.1.left/0.0.1280.680/1920.0.1920.1040@0.0.1280.680" timestamp="1620328760224" />
+    <state width="914" height="505" key="GridCell.Tab.1.left/0.0.1280.680/1920.0.1920.1040@1920.0.1920.1040" timestamp="1620301225150" />
     <state width="1237" height="228" key="GridCell.Tab.1.left/0.0.1280.680@0.0.1280.680" timestamp="1619426169441" />
-    <state width="1237" height="228" key="GridCell.Tab.1.right" timestamp="1620140493863">
+    <state width="1237" height="295" key="GridCell.Tab.1.right" timestamp="1620328760224">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1237" height="228" key="GridCell.Tab.1.right/0.0.1280.680/1920.0.1920.1040@0.0.1280.680" timestamp="1620140493863" />
-    <state width="1877" height="463" key="GridCell.Tab.1.right/0.0.1280.680/1920.0.1920.1040@1920.0.1920.1040" timestamp="1614124322522" />
+    <state width="1237" height="295" key="GridCell.Tab.1.right/0.0.1280.680/1920.0.1920.1040@0.0.1280.680" timestamp="1620328760224" />
+    <state width="914" height="505" key="GridCell.Tab.1.right/0.0.1280.680/1920.0.1920.1040@1920.0.1920.1040" timestamp="1620301225150" />
     <state width="1237" height="228" key="GridCell.Tab.1.right/0.0.1280.680@0.0.1280.680" timestamp="1619426169442" />
-    <state x="143" y="52" width="995" height="628" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2" timestamp="1613125024891">
-      <screen x="0" y="0" width="1280" height="680" />
-    </state>
-    <state x="143" y="52" width="995" height="628" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2/0.0.1280.680/1920.0.1920.1040@0.0.1280.680" timestamp="1613125024891" />
-    <state x="633" y="0" width="653" height="687" key="dock-window-1" timestamp="1620145648352">
-      <screen x="0" y="0" width="1280" height="680" />
-    </state>
-    <state x="2863" y="0" width="984" height="523" key="dock-window-1/0.0.1280.680/1920.0.1920.1040@0.0.1280.680" timestamp="1620135140294" />
-    <state x="2356" y="-15" width="607" height="445" maximized="true" key="dock-window-1/0.0.1280.680/1920.0.1920.1040@1920.0.1920.1040" timestamp="1613644357108" />
-    <state x="633" y="0" width="653" height="687" key="dock-window-1/0.0.1280.680@0.0.1280.680" timestamp="1620145648352" />
-    <state x="1913" y="0" width="974" height="638" key="dock-window-2" timestamp="1620109163827">
+    <state x="2527" y="195" key="SettingsEditor" timestamp="1622359159788">
       <screen x="1920" y="0" width="1920" height="1040" />
     </state>
-    <state x="1913" y="0" width="974" height="638" key="dock-window-2/0.0.1280.680/1920.0.1920.1040@0.0.1280.680" timestamp="1620109163827" />
+    <state x="2527" y="195" key="SettingsEditor/0.0.1280.680/1920.0.1920.1040@1920.0.1920.1040" timestamp="1622359159788" />
+    <state x="2356" y="-15" width="607" height="445" key="dock-window-1" timestamp="1622355474742">
+      <screen x="1920" y="0" width="1920" height="1040" />
+    </state>
+    <state x="2873" y="0" width="974" height="1047" key="dock-window-1/0.0.1280.680/1920.0.1920.1040@0.0.1280.680" timestamp="1620307798806" />
+    <state x="2356" y="-15" width="607" height="445" key="dock-window-1/0.0.1280.680/1920.0.1920.1040@1920.0.1920.1040" timestamp="1622355474742" />
+    <state x="633" y="0" width="653" height="687" key="dock-window-1/0.0.1280.680@0.0.1280.680" timestamp="1620145962073" />
+    <state x="1920" y="0" width="1032" height="733" key="dock-window-2" timestamp="1620258063720">
+      <screen x="1920" y="0" width="1920" height="1040" />
+    </state>
+    <state x="1920" y="0" width="1032" height="733" key="dock-window-2/0.0.1280.680/1920.0.1920.1040@0.0.1280.680" timestamp="1620258063720" />
     <state x="101" y="-8" width="971" height="668" maximized="true" key="dock-window-2/0.0.1280.680@0.0.1280.680" timestamp="1613848503786" />
-    <state x="-7" y="0" width="653" height="687" key="dock-window-3" timestamp="1620145648352">
-      <screen x="0" y="0" width="1280" height="680" />
+    <state x="1920" y="0" width="1032" height="344" key="dock-window-3" timestamp="1620259802680">
+      <screen x="1920" y="0" width="1920" height="1040" />
     </state>
-    <state x="1913" y="0" width="966" height="991" key="dock-window-3/0.0.1280.680/1920.0.1920.1040@0.0.1280.680" timestamp="1620135140295" />
-    <state x="-7" y="0" width="653" height="687" key="dock-window-3/0.0.1280.680@0.0.1280.680" timestamp="1620145648352" />
-    <state x="305" y="209" width="981" height="477" key="dock-window-4" timestamp="1620145648352">
-      <screen x="0" y="0" width="1280" height="680" />
+    <state x="1920" y="0" width="1032" height="344" key="dock-window-3/0.0.1280.680/1920.0.1920.1040@0.0.1280.680" timestamp="1620259802680" />
+    <state x="-7" y="0" width="653" height="687" maximized="true" key="dock-window-3/0.0.1280.680@0.0.1280.680" timestamp="1620147072690" />
+    <state x="2873" y="0" width="974" height="1047" key="dock-window-4" timestamp="1622355474743">
+      <screen x="1920" y="0" width="1920" height="1040" />
     </state>
-    <state x="2863" y="513" width="981" height="477" key="dock-window-4/0.0.1280.680/1920.0.1920.1040@0.0.1280.680" timestamp="1620135140295" />
-    <state x="305" y="209" width="981" height="477" key="dock-window-4/0.0.1280.680@0.0.1280.680" timestamp="1620145648352" />
+    <state x="2873" y="0" width="974" height="1047" key="dock-window-4/0.0.1280.680/1920.0.1920.1040@0.0.1280.680" timestamp="1620329570005" />
+    <state x="2873" y="0" width="974" height="1047" key="dock-window-4/0.0.1280.680/1920.0.1920.1040@1920.0.1920.1040" timestamp="1622355474743" />
+    <state x="305" y="209" width="981" height="477" key="dock-window-4/0.0.1280.680@0.0.1280.680" timestamp="1620147072690" />
+    <state x="1913" y="0" width="974" height="1047" key="dock-window-5" timestamp="1622355474743">
+      <screen x="1920" y="0" width="1920" height="1040" />
+    </state>
+    <state x="1913" y="0" width="974" height="1047" key="dock-window-5/0.0.1280.680/1920.0.1920.1040@0.0.1280.680" timestamp="1620316724097" />
+    <state x="1913" y="0" width="974" height="1047" key="dock-window-5/0.0.1280.680/1920.0.1920.1040@1920.0.1920.1040" timestamp="1622355474743" />
     <state x="347" y="75" width="587" height="530" key="find.popup" timestamp="1614021425540">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
     <state x="347" y="75" width="587" height="530" key="find.popup/0.0.1280.680/1920.0.1920.1040@0.0.1280.680" timestamp="1614021425540" />
-    <state x="415" y="147" width="672" height="445" key="search.everywhere.popup" timestamp="1614504993777">
+    <state x="2633" y="381" key="git4idea.rebase.GitRebaseDialog" timestamp="1622355905721">
+      <screen x="1920" y="0" width="1920" height="1040" />
+    </state>
+    <state x="2633" y="381" key="git4idea.rebase.GitRebaseDialog/0.0.1280.680/1920.0.1920.1040@1920.0.1920.1040" timestamp="1622355905721" />
+    <state x="2614" y="419" key="git4idea.ui.GitStashDialog" timestamp="1622355932416">
+      <screen x="1920" y="0" width="1920" height="1040" />
+    </state>
+    <state x="2614" y="419" key="git4idea.ui.GitStashDialog/0.0.1280.680/1920.0.1920.1040@1920.0.1920.1040" timestamp="1622355932416" />
+    <state x="493" y="93" width="672" height="445" key="search.everywhere.popup" timestamp="1620312239457">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state x="493" y="93" width="672" height="445" key="search.everywhere.popup/0.0.1280.680/1920.0.1920.1040@0.0.1280.680" timestamp="1613727755337" />
+    <state x="493" y="93" width="672" height="445" key="search.everywhere.popup/0.0.1280.680/1920.0.1920.1040@0.0.1280.680" timestamp="1620312239457" />
     <state x="415" y="147" width="672" height="445" key="search.everywhere.popup/0.0.1280.680@0.0.1280.680" timestamp="1614504993777" />
   </component>
   <component name="XDebuggerManager">
@@ -352,7 +348,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/CTTD/MainTest.java</url>
-          <line>43</line>
+          <line>46</line>
           <option name="timeStamp" value="291" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -362,18 +358,48 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/CttdSolver/SpncMedicalUnit.java</url>
-          <line>190</line>
-          <option name="timeStamp" value="313" />
+          <line>99</line>
+          <option name="timeStamp" value="334" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/CttdSolver/SpcnDcop.java</url>
-          <line>87</line>
-          <option name="timeStamp" value="317" />
+          <url>file://$PROJECT_DIR$/src/CttdSolver/SpncMedicalUnit.java</url>
+          <line>106</line>
+          <option name="timeStamp" value="335" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/CttdSolver/SpcnDcop.java</url>
-          <line>90</line>
-          <option name="timeStamp" value="318" />
+          <url>file://$PROJECT_DIR$/src/CttdSolver/SpcnDisasterSite.java</url>
+          <line>458</line>
+          <option name="timeStamp" value="341" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/CttdSolver/SpcnDisasterSite.java</url>
+          <line>487</line>
+          <option name="timeStamp" value="344" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/StaticCTTD/StaticAllocation.java</url>
+          <line>80</line>
+          <option name="timeStamp" value="347" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/StaticCTTD/StaticAllocation.java</url>
+          <line>85</line>
+          <option name="timeStamp" value="348" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/CttdSolver/Greedy.java</url>
+          <line>134</line>
+          <option name="timeStamp" value="349" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/CttdSolver/Greedy.java</url>
+          <line>77</line>
+          <option name="timeStamp" value="350" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/CttdSolver/Greedy.java</url>
+          <line>76</line>
+          <option name="timeStamp" value="351" />
         </line-breakpoint>
         <line-breakpoint type="java-method">
           <url>file://$PROJECT_DIR$/src/PoliceTaskAllocation/Initialize.java</url>
@@ -385,7 +411,7 @@
         </line-breakpoint>
         <line-breakpoint type="java-method">
           <url>file://$PROJECT_DIR$/src/CTTD/DisasterSite.java</url>
-          <line>189</line>
+          <line>190</line>
           <properties class="CTTD.DisasterSite" method="removeCasualty">
             <option name="EMULATED" value="true" />
           </properties>
@@ -393,7 +419,7 @@
         </line-breakpoint>
         <line-breakpoint type="java-method">
           <url>file://$PROJECT_DIR$/src/CTTD/DisasterSite.java</url>
-          <line>208</line>
+          <line>209</line>
           <properties class="CTTD.DisasterSite" method="isAgentRequired">
             <option name="EMULATED" value="true" />
           </properties>
@@ -416,20 +442,18 @@
           <option name="timeStamp" value="303" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-method">
-          <url>file://$PROJECT_DIR$/src/CttdSolver/SpcnDcop.java</url>
-          <line>36</line>
-          <properties class="CttdSolver.SpcnDcop" method="createConstraintGraph">
+          <url>file://$PROJECT_DIR$/src/CttdSolver/SpcnDisasterSite.java</url>
+          <line>473</line>
+          <properties class="CttdSolver.SpcnDisasterSite" method="calcHeuristicShapley">
             <option name="EMULATED" value="true" />
           </properties>
-          <option name="timeStamp" value="315" />
+          <option name="timeStamp" value="342" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
     <pin-to-top-manager>
       <pinned-members>
-        <PinnedItemInfo typeName="CTTD.Execution" fieldName="activity" />
-        <PinnedItemInfo typeName="CTTD.MedicalUnit" fieldName="relevantTasksUtility" />
-        <PinnedItemInfo typeName="PoliceTaskAllocation.MissionEvent" fieldName="hardConstraintTime" />
+        <PinnedItemInfo typeName="CttdSolver.GreedyMedicalUnit" fieldName="currentAssignment" />
         <PinnedItemInfo typeName="CTTD.MedicalUnit" fieldName="skills" />
         <PinnedItemInfo typeName="CTTD.Casualty" fieldName="timeToSurvive" />
         <PinnedItemInfo typeName="TaskAllocation.Assignment" fieldName="task" />
@@ -438,19 +462,23 @@
         <PinnedItemInfo typeName="CTTD.DisasterSite" fieldName="demands" />
         <PinnedItemInfo typeName="CTTD.DisasterSite" fieldName="missionArrivalTime" />
         <PinnedItemInfo typeName="CTTD.mainSimulation" fieldName="activeEvents" />
-        <PinnedItemInfo typeName="CTTD.Casualty" fieldName="TBorn" />
-        <PinnedItemInfo typeName="CTTD.MedicalUnit" fieldName="currentCapacity" />
         <PinnedItemInfo typeName="CTTD.DisasterSite" fieldName="messageBox" />
-        <PinnedItemInfo typeName="CTTD.mainSimulation" fieldName="medicalUnits" />
         <PinnedItemInfo typeName="CTTD.DisasterSite" fieldName="relevantAgentsUtility" />
         <PinnedItemInfo typeName="CTTD.GenerateProblem" fieldName="MaxCasForSite" />
         <PinnedItemInfo typeName="CTTD.MedicalUnit" fieldName="messageToBeSent" />
-        <PinnedItemInfo typeName="TaskAllocation.Assignment" fieldName="agent" />
-        <PinnedItemInfo typeName="CTTD.DisasterSite" fieldName="casualties" />
-        <PinnedItemInfo typeName="CTTD.Hospital" fieldName="casualties" />
-        <PinnedItemInfo typeName="CTTD.Execution" fieldName="triage" />
         <PinnedItemInfo typeName="java.util.HashMap$Node" fieldName="key" />
         <PinnedItemInfo typeName="CTTD.DisasterSite" fieldName="relevantAgentsTimeArrival" />
+        <PinnedItemInfo typeName="CTTD.Execution" fieldName="activity" />
+        <PinnedItemInfo typeName="CTTD.MedicalUnit" fieldName="relevantTasksUtility" />
+        <PinnedItemInfo typeName="PoliceTaskAllocation.MissionEvent" fieldName="hardConstraintTime" />
+        <PinnedItemInfo typeName="CTTD.Casualty" fieldName="TBorn" />
+        <PinnedItemInfo typeName="CTTD.MedicalUnit" fieldName="currentCapacity" />
+        <PinnedItemInfo typeName="CTTD.mainSimulation" fieldName="medicalUnits" />
+        <PinnedItemInfo typeName="TaskAllocation.Assignment" fieldName="agent" />
+        <PinnedItemInfo typeName="CTTD.DisasterSite" fieldName="casualties" />
+        <PinnedItemInfo typeName="CttdSolver.SpcnDisasterSite" fieldName="relevantAgentsUtility" />
+        <PinnedItemInfo typeName="CTTD.Hospital" fieldName="casualties" />
+        <PinnedItemInfo typeName="CTTD.Execution" fieldName="triage" />
       </pinned-members>
     </pin-to-top-manager>
     <watches-manager>

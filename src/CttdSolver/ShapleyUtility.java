@@ -18,7 +18,8 @@ public class ShapleyUtility  extends Utility{
     @Override
     public void calculateUtility() {
 
-       utility= disasterSite.calcShapleyValue(agent);
+     //  utility= disasterSite.calcHeuristicShapley(agent);
+        utility= disasterSite.calcShapleyValue(agent);
 
     }
 

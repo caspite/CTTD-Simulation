@@ -14,7 +14,7 @@ public class SpcnDcop extends Solver{
 
     Vector<Agent> medicalUnits;
     Vector<Task> disasterSites;
-    int iteration=50;//num of max iteration
+    int iteration=300;//num of max iteration
     Mailer mailer;
     Output output;
     double tnow;

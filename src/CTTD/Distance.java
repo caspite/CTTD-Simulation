@@ -21,7 +21,7 @@ public class Distance {
         Location taskLocation =task.getLocation(); //get the event location
         double distance = distance(agentLocation,taskLocation); //calc the distance between two points
         double agentSpeed = agent.getSpeed();// get the speed
-        timeToTravel = distance / agentSpeed; //calc the travel time
+        timeToTravel = (distance / agentSpeed)*60; //calc the travel time
 
         return timeToTravel;
     }

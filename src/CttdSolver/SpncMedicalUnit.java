@@ -4,7 +4,6 @@ import CTTD.*;
 import DCOP.Message;
 import DCOP.MessageBox;
 import PoliceTaskAllocation.AgentType;
-import TaskAllocation.Agent;
 import TaskAllocation.Assignment;
 import TaskAllocation.Location;
 import TaskAllocation.Task;
@@ -111,17 +110,17 @@ public class SpncMedicalUnit extends MedicalUnit{
 
                 double startTime = relevantTasksArrivalTime.get(task);
                 Vector<Skill> execution = ((UtilityMessage) message).getExecution();
-                double utility=((UtilityMessage) message).getRatio();
+                double ratio =((UtilityMessage) message).getRatio();
                 //Capacity capacity = new Capacity(execution,currentCapacity); //TODO - all execution
                 Capacity capacity = new Capacity(getAvailableSkillsForAllocation(),currentCapacity);
 
 
                 updateExecutionPenalty(execution,1);
-                allocateTask(ranking, task, startTime,execution,utility);
+                allocateTask(ranking, task, startTime,execution, ratio);
                 updateAvailableSkillsForAllocation(execution);
                 updateNextTimeToAllocation(startTime, execution);
                 createServiceMessage(startTime, capacity, task);
-                ((DisasterSite)task).updateRemainCoverByCurrentAllocation(utility);
+                ((SpcnDisasterSite)task).updateRemainCoverByCurrentAllocation(ratio);
 
                 ranking++;
             } else {
@@ -156,7 +155,7 @@ public class SpncMedicalUnit extends MedicalUnit{
         return false;
     }
 
-    private void updateExecutionPenalty(Vector<Skill> skills,int factor){
+    protected void updateExecutionPenalty(Vector<Skill> skills,int factor){
         for(Skill skill:skills){
             if(skill instanceof Execution){
                 ((Execution)skill).updatePenalty(factor);
@@ -164,7 +163,7 @@ public class SpncMedicalUnit extends MedicalUnit{
         }
     }
 
-    private double ArrivalTimeAccordingToCurrentAllocation(Task task) {
+    public double ArrivalTimeAccordingToCurrentAllocation(Task task) {
         double distance = getDistance(task);
         for(int i=0;i<currentAssignment.length;i++) {
             if(currentAssignment[i]!=null){
@@ -194,7 +193,7 @@ public class SpncMedicalUnit extends MedicalUnit{
 
     }
 
-    private void updateAvailableSkillsForAllocation(Vector<Skill> execution) {
+    protected void updateAvailableSkillsForAllocation(Vector<Skill> execution) {
         availableSkillsForAllocation.removeAll(execution);
         for(Skill skill:execution){
             currentCapacity-=skill.getScore();
@@ -209,12 +208,12 @@ public class SpncMedicalUnit extends MedicalUnit{
         System.out.println("agent "+this.id+" agent type: "+this.agentType+" task: "+task.getId()+"arrival: "+ timeArrival);
     }
 
-    private void allocateTask(int index, Task task, double timeArrival,Vector<Skill> execution,double utility) {
+    protected void allocateTask(int index, Task task, double timeArrival,Vector<Skill> execution,double utility) {
         Assignment assignment = new Assignment(this, task, utility, timeArrival,execution);
         currentAssignment[index] = assignment;
     }
 
-    private void updateNextTimeToAllocation(double startTime, Vector<Skill> execution) {
+    protected void updateNextTimeToAllocation(double startTime, Vector<Skill> execution) {
         nextTimeToAllocation = startTime;
         for (Skill s : execution) {
             nextTimeToAllocation += s.getDuration();

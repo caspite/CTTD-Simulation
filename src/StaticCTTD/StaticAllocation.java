@@ -4,6 +4,7 @@ import CTTD.DisasterSite;
 import CTTD.GenerateProblem;
 import CTTD.MedicalUnit;
 import CTTD.Triage;
+import CttdSolver.Greedy;
 import CttdSolver.SpcnDcop;
 import DCOP.Mailer;
 import DCOP.Output;
@@ -11,6 +12,7 @@ import PoliceTaskAllocation.AgentType;
 import TaskAllocation.Agent;
 import TaskAllocation.Assignment;
 import TaskAllocation.Task;
+import CttdSolver.Solver;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +30,7 @@ public class StaticAllocation {
         int disasterSiteAmount=10; //amount of sites
         Map<Double, Integer> priorities=new TreeMap<>();//prop for disasters site priority
         Map<Integer, Integer> casualtiesAmount=new TreeMap<>();//the amount of casualties by disaster site priority
-        double newCasProp=0.5;
+        double newCasProp=1;
         Map<Double, Triage > prop1=new TreeMap<>();
         Map<Double, Triage> prop2=new TreeMap<>();
         Map<Double, Triage> prop3=new TreeMap<>();
@@ -55,8 +57,8 @@ public class StaticAllocation {
         typeProp.put(0.5,AgentType.TYPE2);
         typeProp.put(0.8,AgentType.TYPE3);
         typeProp.put(1.0,AgentType.TYPE4);
-        int algorithmType=1;
-        int algorithmVersion=0;//for spnc 1- 1-ratio,0-ratio 3-shapely val
+        int algorithmType=1;//0-dbug,1-spnc,2-greedy
+        int algorithmVersion=3;//for spnc 1- 1-ratio,0-survaival 3-shapely val
 
 
 
@@ -76,8 +78,17 @@ public class StaticAllocation {
             newProblem.printProp();
             newProblem.writeToFile();
             //*** solve ***//
+            Solver s;
+            if(algorithmType==1){
+                s = new SpcnDcop(newProblem.getMedicalUnits(), newProblem.getDisasterSites(), mailer, 0.0,algorithmVersion);
+            }
+            else if(algorithmType==2){
+                s=new Greedy(newProblem.getMedicalUnits(), newProblem.getDisasterSites(),0.0);
+            }
+            else {
+                s = new SpcnDcop(newProblem.getMedicalUnits(), newProblem.getDisasterSites(), mailer, 0.0,algorithmVersion);
+            }
 
-            SpcnDcop s = new SpcnDcop(newProblem.getMedicalUnits(), newProblem.getDisasterSites(), mailer, 0.0,algorithmVersion);
             s.createConstraintGraph(0.0);
             Vector<Assignment> newAllocation = s.solve();
             updateOutput(s.getOutput(), outputs);

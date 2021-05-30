@@ -1,6 +1,8 @@
 package StaticCTTD;
 
 import CTTD.*;
+import CttdSolver.GreedyDisasterSite;
+import CttdSolver.GreedyMedicalUnit;
 import CttdSolver.SpcnDisasterSite;
 import CttdSolver.SpncMedicalUnit;
 import DCOP.Output;
@@ -102,6 +104,10 @@ public class GenerateStaticProblem {
             DisasterSites.add(new SpcnDisasterSite(loc,ID,Tnow,priority));
         }
 
+        else if(algorithmType==2){
+            DisasterSites.add(new GreedyDisasterSite(loc,ID,Tnow,priority));
+        }
+
         tempCasualties.clear();
     }
 
@@ -136,6 +142,11 @@ public class GenerateStaticProblem {
         else if(algorithmType==1){
             Agent mu =new SpncMedicalUnit(ID,agt,loc);
             MedicalUnits.add((SpncMedicalUnit) mu);
+            agents.add(mu);
+        }
+        else if(algorithmType==2){
+            Agent mu =new GreedyMedicalUnit(ID,agt,loc);
+            MedicalUnits.add((GreedyMedicalUnit) mu);
             agents.add(mu);
         }
 

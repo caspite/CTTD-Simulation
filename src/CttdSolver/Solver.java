@@ -1,5 +1,6 @@
 package CttdSolver;
 
+import DCOP.Output;
 import TaskAllocation.Agent;
 import TaskAllocation.Assignment;
 import TaskAllocation.Task;
@@ -17,9 +18,10 @@ public abstract class Solver {
 
     protected Solver(){}
 
-    protected abstract void createConstraintGraph(double tnow);
+    public abstract void createConstraintGraph(double tnow);
 
-    protected abstract Vector<Assignment> solve();
+    public abstract Vector<Assignment> solve();
+    public abstract Output getOutput();
 
 
 

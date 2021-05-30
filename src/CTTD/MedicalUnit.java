@@ -269,7 +269,7 @@ public class MedicalUnit extends Agent implements Messageable {
         return false;
     }
 
-    private void updateExecutionPenalty(Vector<Skill> skills,int factor){
+    protected void updateExecutionPenalty(Vector<Skill> skills,int factor){
         for(Skill skill:skills){
             if(skill instanceof Execution){
                 ((Execution)skill).updatePenalty(factor);
@@ -277,7 +277,7 @@ public class MedicalUnit extends Agent implements Messageable {
         }
     }
 
-    private double ArrivalTimeAccordingToCurrentAllocation(Task task) {
+    public double ArrivalTimeAccordingToCurrentAllocation(Task task) {
         double distance = getDistance(task);
       for(int i=0;i<currentAssignment.length;i++) {
           if(currentAssignment[i]!=null){
@@ -307,7 +307,7 @@ public class MedicalUnit extends Agent implements Messageable {
 
     }
 
-    private void updateAvailableSkillsForAllocation(Vector<Skill> execution) {
+    protected void updateAvailableSkillsForAllocation(Vector<Skill> execution) {
         availableSkillsForAllocation.removeAll(execution);
         for(Skill skill:execution){
             currentCapacity-=skill.getScore();
@@ -322,12 +322,12 @@ public class MedicalUnit extends Agent implements Messageable {
         System.out.println("agent "+this.id+" agent type: "+this.agentType+" task: "+task.getId()+"arrival: "+ timeArrival);
     }
 
-    private void allocateTask(int index, Task task, double timeArrival,Vector<Skill> execution,double utility) {
+    protected void allocateTask(int index, Task task, double timeArrival,Vector<Skill> execution,double utility) {
         Assignment assignment = new Assignment(this, task, utility, timeArrival,execution);
         currentAssignment[index] = assignment;
     }
 
-    private void updateNextTimeToAllocation(double startTime, Vector<Skill> execution) {
+    protected void updateNextTimeToAllocation(double startTime, Vector<Skill> execution) {
         nextTimeToAllocation = startTime;
         for (Skill s : execution) {
             nextTimeToAllocation += s.getDuration();
